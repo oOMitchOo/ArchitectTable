@@ -3,6 +3,7 @@ package net.knowcraft.architecttable.init;
 import net.knowcraft.architecttable.helper.LogHelper;
 import net.knowcraft.architecttable.item.ItemBase;
 import net.knowcraft.architecttable.item.ItemDrawingTools;
+import net.knowcraft.architecttable.reference.Reference;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -23,7 +24,7 @@ public class ModItems {
 
     public static void registerModels() {
         // TODO: ModelResourceLocation trouble shooten.
-        LogHelper.error(DRAWING_TOOLS.getUnlocalizedName());
-        ModelLoader.setCustomModelResourceLocation(DRAWING_TOOLS, 0, new ModelResourceLocation(DRAWING_TOOLS.getUnlocalizedName(), "inventory"));
+        // Den komischen substring(indexOf+1) Kram mache ich, um "item." vor dem Namen zu entfernen.
+        ModelLoader.setCustomModelResourceLocation(DRAWING_TOOLS, 0, new ModelResourceLocation(Reference.MOD_ID+":"+DRAWING_TOOLS.getUnlocalizedName().substring(DRAWING_TOOLS.getUnlocalizedName().indexOf(".")+1), "inventory"));
     }
 }

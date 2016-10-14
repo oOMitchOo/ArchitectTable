@@ -5,6 +5,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -50,9 +51,24 @@ public class BlockArchitectTable extends BlockBase {
         }
     }
 
-     @Override
-     public Item getItemDropped(IBlockState state, Random rand, int fortune)
-     {
+    // Wird direkt aufgerufen, um die genaue BlockState zu erfassen, wenn der Block das BlockItems (mit placeBlockAt()) gesetzt wird.
+    @Override
+    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+    {
+        // Wir wollen, dass die Block-Richtung entgegen der horizontalen Spieler-Guck-Richtung ist.
+        return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+    }
+
+    // Vielleicht überflüssig, da onBlockPlaced die Methode nicht aufruft, sondern gleich den Multiblock baut.
+    @Override
+    public IBlockState getStateFromMeta(int meta)
+    {
+        return this.getDefaultState();
+    }
+
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune)
+    {
          // So wird in BlockBed nach der State gecheckt:
          // state.getValue(PART) == BlockBed.EnumPartType.FOOT
          // Ersetze ich mal mit dem Vorigen MetaDatenVergleich:
@@ -67,7 +83,7 @@ public class BlockArchitectTable extends BlockBase {
          } else {
              return null;
          }
-     }
+    }
 
      // Muss ich eventuell nicht überschreiben, da die Blöcke ja nicht per Hand gesetzt werden (sich also nicht nach einem Block-Update anpassen müssen)
      // Die Blöcke werden vielmehr vom Item-Event ein mal gesetzt und danach höchstens wieder zerstört - nicht geändert.
