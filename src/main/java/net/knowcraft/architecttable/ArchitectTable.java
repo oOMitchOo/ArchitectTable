@@ -1,6 +1,8 @@
 package net.knowcraft.architecttable;
 
+import net.knowcraft.architecttable.block.BlockArchitectTable;
 import net.knowcraft.architecttable.helper.LogHelper;
+import net.knowcraft.architecttable.init.ModBlocks;
 import net.knowcraft.architecttable.init.ModItems;
 import net.knowcraft.architecttable.proxy.IProxy;
 import net.knowcraft.architecttable.reference.Reference;
@@ -28,7 +30,17 @@ public class ArchitectTable {
     {
         ModItems.init();
         ModItems.register();
+        ModItems.registerRecipes();
         proxy.registerItemModels();
+
+        ModBlocks.init();
+        ModBlocks.register();
+        proxy.registerItemBlockModels();
+
+        // Gibt aus: PropertyEnum{name=part, clazz=class net.knowcraft.architecttable.block.BlockArchitectTable$EnumArcTablePart, values=[table_left, table_right, pinboard_left, pinboard_right]}
+        // LogHelper.error(BlockArchitectTable.PART.toString);
+        // Gibt aus: [PropertyEnum{name=facing, clazz=class net.minecraft.util.EnumFacing, values=[down, up, north, south, west, east]}, PropertyEnum{name=part, clazz=class net.knowcraft.architecttable.block.BlockArchitectTable$EnumArcTablePart, values=[table_left, table_right, pinboard_left, pinboard_right]}]
+        // LogHelper.error(ModBlocks.ARCHITECT_TABLE.getBlockState().getProperties());
 
         LogHelper.info("Pre Initialization Complete!");
     }

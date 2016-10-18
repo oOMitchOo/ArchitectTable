@@ -1,0 +1,42 @@
+{
+  "forge_marker": 1,
+  "defaults":
+  {
+    "textures":
+    {
+      "particle": "minecraft:blocks/hardened_clay_stained_cyan",
+      "all": "minecraft:blocks/hardened_clay_stained_white"
+    },
+    "model": "block/block"
+  }, "variants":
+    {
+      "inventory": { "model": "block/block" },
+      "facing=south,part=table_left": {"model": "architecttable:architect_table_table_left", "uvlock": true},
+      "facing=west,part=table_left": {"model": "architecttable:architect_table_table_left", "uvlock": true, "y": 90},
+      "facing=north,part=table_left": {"model": "architecttable:architect_table_table_left", "uvlock": true, "y": 180},
+      "facing=east,part=table_left": {"model": "architecttable:architect_table_table_left", "uvlock": true, "y": 270},
+      "facing=up,part=table_left": {"model": "architecttable:architect_table_table_left", "uvlock": true}, // Just for error prevention. Block should never be oriented this way.
+      "facing=down,part=table_left": {"model": "architecttable:architect_table_table_left", "uvlock": true}, // See first comment.
+
+      "facing=south,part=table_right": {"model": "architecttable:architect_table_table_right", "uvlock": true},
+      "facing=west,part=table_right": {"model": "architecttable:architect_table_table_right", "uvlock": true, "y": 90},
+      "facing=north,part=table_right": {"model": "architecttable:architect_table_table_right", "uvlock": true, "y": 180},
+      "facing=east,part=table_right": {"model": "architecttable:architect_table_table_right", "uvlock": true, "y": 270},
+      "facing=up,part=table_right": {"model": "architecttable:architect_table_table_right", "uvlock": true}, // See first comment.
+      "facing=down,part=table_right": {"model": "architecttable:architect_table_table_right", "uvlock": true}, // See first comment.
+
+      "facing=south,part=pinboard_left": {"model": "architecttable:architect_table_pinboard_left", "uvlock": true},
+      "facing=west,part=pinboard_left": {"model": "architecttable:architect_table_pinboard_left", "uvlock": true, "y": 90},
+      "facing=north,part=pinboard_left": {"model": "architecttable:architect_table_pinboard_left", "uvlock": true, "y": 180},
+      "facing=east,part=pinboard_left": {"model": "architecttable:architect_table_pinboard_left", "uvlock": true, "y": 270},
+      "facing=up,part=pinboard_left": {"model": "architecttable:architect_table_pinboard_left", "uvlock": true}, // See first comment.
+      "facing=down,part=pinboard_left": {"model": "architecttable:architect_table_pinboard_left", "uvlock": true}, // See first comment.
+
+      "facing=south,part=pinboard_right": {"model": "architecttable:architect_table_pinboard_right", "uvlock": true},
+      "facing=west,part=pinboard_right": {"model": "architecttable:architect_table_pinboard_right", "uvlock": true, "y": 90},
+      "facing=north,part=pinboard_right": {"model": "architecttable:architect_table_pinboard_right", "uvlock": true, "y": 180},
+      "facing=east,part=pinboard_right": {"model": "architecttable:architect_table_pinboard_right", "uvlock": true, "y": 270},
+      "facing=up,part=pinboard_right": {"model": "architecttable:architect_table_pinboard_right", "uvlock": true}, // See first comment.
+      "facing=down,part=pinboard_right": {"model": "architecttable:architect_table_pinboard_right", "uvlock": true} // See first comment.
+    }
+}

@@ -1,9 +1,12 @@
 package net.knowcraft.architecttable.item;
 
+import net.knowcraft.architecttable.block.BlockArchitectTable;
 import net.knowcraft.architecttable.helper.LogHelper;
+import net.knowcraft.architecttable.init.ModBlocks;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
@@ -11,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -45,12 +49,11 @@ public class ItemDrawingTools extends ItemBase{
         }
     }
 
-    // ERROR: EnumFacing ist welche Seite vom Block man anklickt. Nicht die Richtung in die der Spieler guckt.
     private boolean checkAndBuildMultiBlock(EntityPlayer playerIn, World worldIn, BlockPos planksPos) {
         // Ich gehe davon aus, dass der Spieler entweder so steht, dass die Truhe rechts von den Planks ist,
         // oder so, dass die Truhe hinter den Planks ist. (Alles andere wäre zu umständlich)
 
-        // Horizontal Facing: S-W-N-E ist 0-1-2-3 STIMMT NICHT SONDER: N-E-S-W ist 0-1-2-3
+        // Horizontal Facing: S-W-N-E ist 0-1-2-3
         EnumFacing playerFacing = playerIn.getHorizontalFacing();
         int horizontalIndex = playerFacing.getHorizontalIndex();
         LogHelper.error("Der Spieler guckt nach "+playerFacing.getName()+".");
@@ -58,63 +61,125 @@ public class ItemDrawingTools extends ItemBase{
 
         if(horizontalIndex == 0) {
             // Check for chest (and frames) in South (pos Z) and West (neg X). -> Multiblock facing: North
-            return checkForChestAndFrames(worldIn, planksPos, playerFacing, -1, 1);
+            return checkForChestAndSigns(worldIn, planksPos, playerFacing, -1, 1);
         } else if (horizontalIndex == 1) {
             // Check for chest (and frames) in West (neg X) and North (neg Z). -> Multiblock facing: East
-            return checkForChestAndFrames(worldIn, planksPos, playerFacing, -1, -1);
+            return checkForChestAndSigns(worldIn, planksPos, playerFacing, -1, -1);
         } else if (horizontalIndex == 2) {
             // Check for chest (and frames) in North (neg Z) and East (pos X). -> Multiblock facing: South
-            return checkForChestAndFrames(worldIn, planksPos, playerFacing, 1, -1);
+            return checkForChestAndSigns(worldIn, planksPos, playerFacing, 1, -1);
         } else if (horizontalIndex == 3) {
             // Check for chest (and frames) in East (pox X) and South (pox Z). -> Multiblock facing: West
-            return checkForChestAndFrames(worldIn, planksPos, playerFacing, 1, 1);
+            return checkForChestAndSigns(worldIn, planksPos, playerFacing, 1, 1);
         } else {
             return false;
         }
     }
 
     /** Checks in two given directions from a given BlockPos if chest and signs are in place for Multiblock. */
-    private boolean checkForChestAndFrames (World worldIn, BlockPos planksPos, EnumFacing playerFacing, int xOff, int zOff) {
+    private boolean checkForChestAndSigns (World worldIn, BlockPos planksPos, EnumFacing playerFacing, int xOff, int zOff) {
         // Erst nach Truhe schauen.
-        LogHelper.error("Player guckt in Richtung: "+playerFacing.getName()+" (Index: "+playerFacing.getHorizontalIndex()+")");
         if (worldIn.getBlockState(planksPos.add(xOff, 0, 0)).getBlock() == Blocks.CHEST) {
-            LogHelper.error("Hat an Position "+planksPos.add(xOff, 0, 0)+" eine Truhe gefunden.");
-            // Jetzt noch nach Signs schauen.
+            // Jetzt noch nach Signs schauen. // TODO: Oder lieber nach Item Frames?
             if ((worldIn.getBlockState(planksPos.add(0, 1, 0)).getBlock() == Blocks.WALL_SIGN || worldIn.getBlockState(planksPos.add(0, 1, 0)).getBlock() == Blocks.STANDING_SIGN)
                     && (worldIn.getBlockState(planksPos.add(xOff, 1, 0)).getBlock() == Blocks.WALL_SIGN || worldIn.getBlockState(planksPos.add(xOff, 1, 0)).getBlock() == Blocks.STANDING_SIGN))
             {
-                LogHelper.error("Hat an den Positionen "+planksPos.add(0,1,0)+" und "+planksPos.add(xOff,1,0)+" Schilder gefunden.");
                 // Der Länge nach in Richtung xOff aufbauen. -> Multiblock facing: South oder North.
                 if (playerFacing == EnumFacing.NORTH || playerFacing == EnumFacing.EAST) {
-                    LogHelper.error("Da der Spieler North oder East guckt, wird der MultiBlock facing South gebaut.");
-                    buildMultiBlock(worldIn, planksPos, EnumFacing.SOUTH);
+                    // Erst gucken, ob andere Architect Table zu nah dran sind, bevor gebaut wird.
+                    if (otherArchitectTableTooClose(worldIn, planksPos, EnumFacing.SOUTH)) {
+                        return false;
+                    } else {
+                        buildMultiBlock(worldIn, planksPos, EnumFacing.SOUTH);
+                        return true;
+                    }
                 } else if (playerFacing == EnumFacing.SOUTH || playerFacing == EnumFacing.WEST) {
-                    LogHelper.error("Da der Spieler South oder West guckt, wird der MultiBlock facing North gebaut.");
-                    buildMultiBlock(worldIn, planksPos, EnumFacing.NORTH);
-                }
-                return true;
+                    if (otherArchitectTableTooClose(worldIn, planksPos, EnumFacing.NORTH)) {
+                        return false;
+                    } else {
+                        buildMultiBlock(worldIn, planksPos, EnumFacing.NORTH);
+                        return true;
+                    }
+                } else return false;
             } else return false;
         }
         if (worldIn.getBlockState(planksPos.add(0, 0, zOff)).getBlock() == Blocks.CHEST) {
-            LogHelper.error("Hat an Position "+planksPos.add(0, 0, zOff)+" eine Truhe gefunden.");
             // Jetzt noch nach Signs schauen.
             if ((worldIn.getBlockState(planksPos.add(0, 1, 0)).getBlock() == Blocks.WALL_SIGN || worldIn.getBlockState(planksPos.add(0, 1, 0)).getBlock() == Blocks.STANDING_SIGN)
                     && (worldIn.getBlockState(planksPos.add(0, 1, zOff)).getBlock() == Blocks.WALL_SIGN || worldIn.getBlockState(planksPos.add(0, 1, zOff)).getBlock() == Blocks.STANDING_SIGN))
             {
-                LogHelper.error("Hat an den Positionen "+planksPos.add(0,1,0)+" und "+planksPos.add(0,1,zOff)+" Schilder gefunden.");
                 // Der Länge nach in Richtung zOff aufbauen. -> Multiblock facing: East oder West.
                 if (playerFacing == EnumFacing.NORTH || playerFacing == EnumFacing.WEST) {
-                    LogHelper.error("Da der Spieler North oder West guckt, wird der MultiBlock facing East gebaut.");
-                    buildMultiBlock(worldIn, planksPos, EnumFacing.EAST);
+                    // Erst gucken, ob andere Architect Table zu nah dran sind, bevor gebaut wird.
+                    if (otherArchitectTableTooClose(worldIn, planksPos, EnumFacing.EAST)) {
+                        return false;
+                    } else {
+                        buildMultiBlock(worldIn, planksPos, EnumFacing.EAST);
+                        return true;
+                    }
                 } else if (playerFacing == EnumFacing.SOUTH || playerFacing == EnumFacing.EAST) {
-                    LogHelper.error("Da der Spieler South oder East guckt, wird der MultiBlock facing West gebaut.");
-                    buildMultiBlock(worldIn, planksPos, EnumFacing.WEST);
-                }
-                return true;
+                    if (otherArchitectTableTooClose(worldIn, planksPos, EnumFacing.WEST)) {
+                        return false;
+                    } else {
+                        buildMultiBlock(worldIn, planksPos, EnumFacing.WEST);
+                        return true;
+                    }
+                } else return false; // Should not be possible.
             } else return false;
         }
         // Wird nur aufgerufen wenn beide if-statements false sind (In beide Richtungen keine Truhe steht).
         return false;
+    }
+
+    // Check if another Architect Table Multiblock is too close to the position where one should be formed.
+    // Folgendes Block-Grid macht es anschaulich (Vogelperspektive). pPos ist die plankPos von der aus gehend der MultiBlock gebaut wird.
+    // "rechts" davon ist die Truhe (ch) und überall, wo ein x ist, darf kein Architect Table stehen.
+    // UND EINE EBENE DARÜBER AUCH NICHT!
+    //  #----#----#----#----#
+    //  |    |  x |  x |    |
+    //  #----#----#----#----#
+    //  |  x |pPos| ch |  x |       |   Multiblock-
+    //  #----#----#----#----#       V   facing
+    //  |    |  x |  x |    |
+    //  #----#----#----#----#
+    // TODO: HIER WEITER!
+    private boolean otherArchitectTableTooClose(World worldIn, BlockPos plankPos, EnumFacing multiBlockFacing)
+    {
+        if (multiBlockFacing == EnumFacing.SOUTH) {
+            // A list of BlockPos which may not contain an architect table (look above for explanation).
+            // TODO: Eine Methode schreiben, die intelligent die vier möglichen groundLevelForbiddenPlaces zusammenfasst.
+            BlockPos[] groundLevelForbiddenPlaces = new BlockPos[] {plankPos.north(), plankPos.north().east(), plankPos.east(2), plankPos.south().east(), plankPos.south(), plankPos.west() };
+            for (BlockPos pos : groundLevelForbiddenPlaces)
+            {
+                if (worldIn.getBlockState(pos).getBlock() instanceof BlockArchitectTable) return true;
+                if (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockArchitectTable) return true;
+            }
+            return false;
+        } else if (multiBlockFacing == EnumFacing.WEST) {
+            BlockPos[] groundLevelForbiddenPlaces = new BlockPos[] {plankPos.north(), plankPos.east(), plankPos.east().south(), plankPos.south(2), plankPos.west().south(), plankPos.west() };
+            for (BlockPos pos : groundLevelForbiddenPlaces)
+            {
+                if (worldIn.getBlockState(pos).getBlock() instanceof BlockArchitectTable) return true;
+                if (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockArchitectTable) return true;
+            }
+            return false;
+        } else if (multiBlockFacing == EnumFacing.NORTH) {
+            BlockPos[] groundLevelForbiddenPlaces = new BlockPos[] {plankPos.north(), plankPos.east(), plankPos.south(), plankPos.south().west(), plankPos.west(2), plankPos.north().west() };
+            for (BlockPos pos : groundLevelForbiddenPlaces)
+            {
+                if (worldIn.getBlockState(pos).getBlock() instanceof BlockArchitectTable) return true;
+                if (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockArchitectTable) return true;
+            }
+            return false;
+        } else if (multiBlockFacing == EnumFacing.EAST) {
+            BlockPos[] groundLevelForbiddenPlaces = new BlockPos[] {plankPos.north(2), plankPos.north().east(), plankPos.east(), plankPos.south(), plankPos.west(), plankPos.north().west() };
+            for (BlockPos pos : groundLevelForbiddenPlaces)
+            {
+                if (worldIn.getBlockState(pos).getBlock() instanceof BlockArchitectTable) return true;
+                if (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockArchitectTable) return true;
+            }
+            return false;
+        } else return true;
     }
 
     private void buildMultiBlock (World worldIn, BlockPos planksPos, EnumFacing multiBlockFacing) {
@@ -122,28 +187,28 @@ public class ItemDrawingTools extends ItemBase{
         if (multiBlockFacing == EnumFacing.NORTH) {
             for (int y = 0; y < 2; ++y){
                 for (int x = 0; x > -2; --x) {
-                    worldIn.setBlockState(planksPos.add(x, y, 0), Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(tableMetaCount)));
+                    worldIn.setBlockState(planksPos.add(x, y, 0), ModBlocks.ARCHITECT_TABLE.getStateFromMeta(tableMetaCount).withProperty(BlockArchitectTable.FACING, EnumFacing.NORTH));
                     ++tableMetaCount;
                 }
             }
         } else if (multiBlockFacing == EnumFacing.EAST) {
             for (int y = 0; y < 2; ++y) {
                 for (int z = 0; z > -2; --z) {
-                    worldIn.setBlockState(planksPos.add(0, y, z), Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(tableMetaCount)));
+                    worldIn.setBlockState(planksPos.add(0, y, z), ModBlocks.ARCHITECT_TABLE.getStateFromMeta(tableMetaCount).withProperty(BlockArchitectTable.FACING, EnumFacing.EAST));
                     ++tableMetaCount;
                 }
             }
         } else if (multiBlockFacing == EnumFacing.SOUTH) {
             for (int y = 0; y < 2; ++y){
                 for (int x = 0; x < 2; ++x) {
-                    worldIn.setBlockState(planksPos.add(x, y, 0), Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(tableMetaCount)));
+                    worldIn.setBlockState(planksPos.add(x, y, 0), ModBlocks.ARCHITECT_TABLE.getStateFromMeta(tableMetaCount).withProperty(BlockArchitectTable.FACING, EnumFacing.SOUTH));
                     ++tableMetaCount;
                 }
             }
         } else if (multiBlockFacing == EnumFacing.WEST) {
             for (int y = 0; y < 2; ++y) {
                 for (int z = 0; z < 2; ++z) {
-                    worldIn.setBlockState(planksPos.add(0, y, z), Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(tableMetaCount)));
+                    worldIn.setBlockState(planksPos.add(0, y, z), ModBlocks.ARCHITECT_TABLE.getStateFromMeta(tableMetaCount).withProperty(BlockArchitectTable.FACING, EnumFacing.WEST));
                     ++tableMetaCount;
                 }
             }

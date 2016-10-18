@@ -1,0 +1,76 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "blocks/planks_oak",
+    "frame": "blocks/log_oak_top",
+    "corner": "blocks/log_big_oak_top",
+    "boardfront": "blocks/hardened_clay",
+    "boardback": "blocks/planks_oak"
+  },
+  "elements": [
+    {
+      "name": "SideBot_WestEast",
+      "from": [ 1.5, 0.5, 0.0 ],
+      "to": [ 16.0, 1.5, 1.0 ],
+      "faces": {
+        "north": { "texture": "frame", "uv": [ 1.0, 0.0, 15.5, 1.0 ] },
+        "south": { "texture": "frame", "uv": [ 1.0, 0.0, 15.5, 1.0 ] },
+        "up": { "texture": "frame", "uv": [ 1.0, 0.0, 15.5, 1.0 ] },
+        "down": { "texture": "frame", "uv": [ 1.0, 0.0, 15.5, 1.0 ] }
+      }
+    },
+    {
+      "name": "CornerBot_EastUp",
+      "from": [ 0.5, 0.5, 0.0 ],
+      "to": [ 1.5, 1.5, 1.0 ],
+      "faces": {
+        "north": { "texture": "corner", "uv": [ 0.0, 0.0, 1.0, 1.0 ] },
+        "south": { "texture": "corner", "uv": [ 0.0, 0.0, 1.0, 1.0 ] },
+        "west": { "texture": "corner", "uv": [ 0.0, 0.0, 1.0, 1.0 ] },
+        "down": { "texture": "corner", "uv": [ 0.0, 0.0, 1.0, 1.0 ] }
+      }
+    },
+    {
+      "name": "SideSide_DownUp",
+      "from": [ 0.5, 1.5, 0.0 ],
+      "to": [ 1.5, 14.5, 1.0 ],
+      "faces": {
+        "north": { "texture": "frame", "uv": [ 0.0, 1.0, 1.0, 14.0 ] },
+        "east": { "texture": "frame", "uv": [ 0.0, 1.0, 1.0, 14.0 ] },
+        "south": { "texture": "frame", "uv": [ 0.0, 1.0, 1.0, 14.0 ] },
+        "west": { "texture": "frame", "uv": [ 0.0, 1.0, 1.0, 14.0 ] }
+      }
+    },
+    {
+      "name": "CornerTop_DownEast",
+      "from": [ 0.5, 14.5, 0.0 ],
+      "to": [ 1.5, 15.5, 1.0 ],
+      "faces": {
+        "north": { "texture": "corner", "uv": [ 0.0, 15.0, 1.0, 16.0 ] },
+        "south": { "texture": "corner", "uv": [ 0.0, 15.0, 1.0, 16.0 ] },
+        "west": { "texture": "corner", "uv": [ 0.0, 15.0, 1.0, 16.0 ] },
+        "up": { "texture": "corner", "uv": [ 0.0, 15.0, 1.0, 16.0 ] }
+      }
+    },
+    {
+      "name": "SideTop_WestEast",
+      "from": [ 1.5, 14.5, 0.0 ],
+      "to": [ 16.0, 15.5, 1.0 ],
+      "faces": {
+        "north": { "texture": "frame", "uv": [ 1.0, 15.0, 15.5, 16.0 ] },
+        "south": { "texture": "frame", "uv": [ 1.0, 15.0, 15.5, 16.0 ] },
+        "up": { "texture": "frame", "uv": [ 1.0, 15.0, 15.5, 16.0 ] },
+        "down": { "texture": "frame", "uv": [ 1.0, 15.0, 15.5, 16.0 ] }
+      }
+    },
+    {
+      "name": "BoardInside_UpDownEastWest",
+      "from": [ 1.5, 1.5, 0.0 ],
+      "to": [ 16.0, 14.5, 0.5 ],
+      "faces": {
+        "north": { "texture": "boardback", "uv": [ 1.5, 1.5, 16.0, 14.5 ] },
+        "south": { "texture": "boardfront", "uv": [ 1.5, 1.5, 16.0, 14.5 ] }
+      }
+    }
+  ]
+}

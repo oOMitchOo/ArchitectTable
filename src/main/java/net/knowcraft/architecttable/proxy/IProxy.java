@@ -5,4 +5,6 @@ package net.knowcraft.architecttable.proxy;
  */
 public interface IProxy {
     void registerItemModels();
+
+    void registerItemBlockModels();
 }

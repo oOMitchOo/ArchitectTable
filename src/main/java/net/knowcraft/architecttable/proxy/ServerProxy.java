@@ -9,4 +9,9 @@ public class ServerProxy extends CommonProxy{
     public void registerItemModels() {
         // Nothing to see here. Go to ClientProxy!
     }
+
+    @Override
+    public void registerItemBlockModels() {
+        // Nothing to see here. Go to ClientProxy!
+    }
 }

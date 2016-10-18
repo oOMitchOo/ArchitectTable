@@ -1,5 +1,6 @@
 package net.knowcraft.architecttable.proxy;
 
+import net.knowcraft.architecttable.init.ModBlocks;
 import net.knowcraft.architecttable.init.ModItems;
 
 /**
@@ -11,4 +12,7 @@ public class ClientProxy extends CommonProxy{
     public void registerItemModels() {
         ModItems.registerModels();
     }
+
+    @Override
+    public void registerItemBlockModels() { ModBlocks.registerItemBlockModels(); }
 }

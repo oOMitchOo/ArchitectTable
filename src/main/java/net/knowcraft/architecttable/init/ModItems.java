@@ -5,6 +5,9 @@ import net.knowcraft.architecttable.item.ItemBase;
 import net.knowcraft.architecttable.item.ItemDrawingTools;
 import net.knowcraft.architecttable.reference.Reference;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.RecipesArmor;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -20,6 +23,14 @@ public class ModItems {
 
     public static void register() {
         GameRegistry.register(DRAWING_TOOLS);
+    }
+
+    public static void registerRecipes() {
+        GameRegistry.addShapedRecipe(new ItemStack(DRAWING_TOOLS),
+                "AA ",
+                "AAB",
+                " BB",
+                'A', new ItemStack(Items.PAPER), 'B', new ItemStack(Items.IRON_INGOT));
     }
 
     public static void registerModels() {

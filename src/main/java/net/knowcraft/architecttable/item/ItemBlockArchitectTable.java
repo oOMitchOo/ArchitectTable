@@ -1,11 +1,11 @@
 package net.knowcraft.architecttable.item;
 
+import net.knowcraft.architecttable.block.BlockArchitectTable;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -40,11 +40,30 @@ public class ItemBlockArchitectTable extends ItemBlock{
             pos = pos.offset(facing);
         }
 
+        // Hier wird gecheckt, ob in unmittelbarer Nähe schon ein ArchitectTable steht. Das darf nicht sein, da getActualState sonst nicht richtig funktioniert und der Multiblock teilweise nicht richtig ausgerichtet sein wird.
+        // Es muss geguckt werden in: pos.offset(spielerrichtung), pos.offset(spielerRichtung.opposite), pos.offset(spielerRichtung.opposite.turnY)
+        // Wenn auf tl (Vogelperspektive) gesetzt wird, dann ist "rechts" davon table_right (tr) und auf den Positionen x darf kein ArchitectTable sein.
+        // UND EINE EBENE DARÜBER!!!
+        //  #----#----#----#----#
+        //  |    |  x |  x |    |
+        //  #----#----#----#----#
+        //  |  x | tl | tr |  x |
+        //  #----#----#----#----#
+        //  |    |  x |  x |    |
+        //  #----#----#----#----#
+        EnumFacing playerFacing = playerIn.getHorizontalFacing();
+        BlockPos[] groundLevelForbiddenPlaces = new BlockPos[] {pos.offset(playerFacing), pos.offset(playerFacing).offset(playerFacing.rotateY()), pos.offset(playerFacing.rotateY(), 2), pos.offset(playerFacing.getOpposite()).offset(playerFacing.rotateY()), pos.offset(playerFacing.getOpposite()), pos.offset(playerFacing.getOpposite().rotateY()) };
+        for (BlockPos forbPos : groundLevelForbiddenPlaces) {
+            if (worldIn.getBlockState(forbPos).getBlock() instanceof BlockArchitectTable) return EnumActionResult.FAIL;
+            // Die up() sorgt dafür, dass auch die Ebene über groundLevel gecheckt wird.
+            if (worldIn.getBlockState(forbPos.up()).getBlock() instanceof BlockArchitectTable) return EnumActionResult.FAIL;
+        }
+
         // Hier wird konkret bestimmt, ob der Block überhaupt gesetzt werden kann (genug Items in der Hand, Spieler Rechte, steht nah genug dran...)
         // Ich habe noch ein paar Bedingungen mehr rangehängt, damit wir genug freie Plätze für den Multiblock garantiert haben.
         EnumFacing buildingDirect = playerIn.getHorizontalFacing().rotateY(); // Macht South zu West, West zu North, North zu East, East zu South
-        if (stack.stackSize != 0 && playerIn.canPlayerEdit(pos, facing, stack) && worldIn.canBlockBePlaced(this.block, pos, false, facing, (Entity)null, stack) && worldIn.getBlockState(pos.up()).getBlock() == Blocks.AIR
-                && worldIn.getBlockState(pos.offset(buildingDirect)).getBlock() == Blocks.AIR && worldIn.getBlockState(pos.up().offset(buildingDirect)).getBlock() == Blocks.AIR)
+        if (stack.stackSize != 0 && playerIn.canPlayerEdit(pos, facing, stack) && worldIn.canBlockBePlaced(this.block, pos, false, facing, (Entity)null, stack) && worldIn.canBlockBePlaced(this.block, pos.up(), false, facing, (Entity)null, stack)
+                && worldIn.canBlockBePlaced(this.block, pos.offset(buildingDirect), false, facing, (Entity)null, stack) && worldIn.canBlockBePlaced(this.block, pos.up().offset(buildingDirect), false, facing, (Entity)null, stack))
         {
             int i = this.getMetadata(stack.getMetadata());
             IBlockState iblockstate1 = this.block.onBlockPlaced(worldIn, pos, facing, hitX, hitY, hitZ, i, playerIn);
@@ -78,9 +97,24 @@ public class ItemBlockArchitectTable extends ItemBlock{
         // newState wurde durch onBlockPlaced bestimmt und ist hier der Left_Table mit Richtung entgegen der Spieler-Blickrichtung.
         // Das hier wird etwas schwierig, da hier einfach probiert wird, ob der Block gesetzt werden kann und wenn nicht, dann kommt ein false.
         // Wir müssten aber erst true oder false für alle 4 Blöcke haben, bevor wir setzen...
-        // TODO: Hier weiter!!!
-        if (!world.setBlockState(pos, newState, 3)) return false;
+        // In world.setBlockState wird gecheckt: this.isOutsideBuildHeight(pos) && !this.isRemote && this.worldInfo.getTerrainType() == WorldType.DEBUG_WORLD
+        // Buildinghöhe für die anderen Blöcke checken sollte reichen, da WorldType beim setzen des LEFT_TABLE gleich danach gecheckt wird.
+        EnumFacing multiBlockFacingDirect = player.getHorizontalFacing().getOpposite();
+        if (pos.up().getY() >= 256) return false;
 
+        // leftTable wird normal probiert zu setzen, wenn erfolgreich, werden die anderen Blöcke gesetzt.
+        if (!world.setBlockState(pos, newState, 3)) return false;
+        else {
+            IBlockState rightTable = this.block.getDefaultState().withProperty(BlockArchitectTable.FACING, player.getHorizontalFacing().getOpposite()).withProperty(BlockArchitectTable.PART, BlockArchitectTable.EnumArcTablePart.TABLE_RIGHT);
+            IBlockState leftPinboard = this.block.getDefaultState().withProperty(BlockArchitectTable.FACING, player.getHorizontalFacing().getOpposite()).withProperty(BlockArchitectTable.PART, BlockArchitectTable.EnumArcTablePart.PINBOARD_LEFT);
+            IBlockState rightPinboard = this.block.getDefaultState().withProperty(BlockArchitectTable.FACING, player.getHorizontalFacing().getOpposite()).withProperty(BlockArchitectTable.PART, BlockArchitectTable.EnumArcTablePart.PINBOARD_RIGHT);
+
+            world.setBlockState(pos.offset(player.getHorizontalFacing().rotateY()), rightTable, 3);
+            world.setBlockState(pos.up(), leftPinboard, 3);
+            world.setBlockState(pos.up().offset(player.getHorizontalFacing().rotateY()), rightPinboard, 3);
+        }
+
+        // TODO: Hier könnte TileEntities erzeugt werden für den ArchitectTable.
         IBlockState state = world.getBlockState(pos);
         if (state.getBlock() == this.block)
         {
