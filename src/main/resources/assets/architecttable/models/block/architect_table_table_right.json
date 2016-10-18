@@ -2,43 +2,211 @@
   "parent": "minecraft:block/block",
   "textures": {
     "particle": "blocks/planks_oak",
-    "fornow": "blocks/planks_oak"
+    "planks": "blocks/planks_oak",
+    "wood": "blocks/log_oak",
+    "chest": "entity/chest/normal"
   },
   "elements": [
     {
       "name": "Base",
-      "from": [ 0.0, 0.0, 0.0 ],
+      "from": [ 0.0, 8.5, 0.0 ],
       "to": [ 16.0, 10.0, 16.0 ],
       "faces": {
-        "north": { "texture": "fornow", "uv": [ 0.0, 6.0, 16.0, 16.0 ] },
-        "east": { "texture": "fornow", "uv": [ 0.0, 6.0, 16.0, 16.0 ] },
-        "south": { "texture": "fornow", "uv": [ 0.0, 6.0, 16.0, 16.0 ] },
-        "up": { "texture": "fornow", "uv": [ 0.0, 0.0, 16.0, 16.0 ] },
-        "down": { "texture": "fornow", "uv": [ 0.0, 0.0, 16.0, 16.0 ] }
-      }
-    },
-    {
-      "name": "Board",
-      "from": [ 0.0, 11.0, 0.0 ],
-      "to": [ 15.9, 12.0, 15.0 ],
-      "rotation": { "origin": [ 8.0, 10.0, 10.0 ], "axis": "x", "angle": 22.5 },
-      "faces": {
-        "north": { "texture": "fornow", "uv": [ 0.0, 5.0, 16.0, 6.0 ] },
-        "east": { "texture": "fornow", "uv": [ 1.0, 5.0, 16.0, 6.0 ] },
-        "south": { "texture": "fornow", "uv": [ 0.0, 5.0, 16.0, 6.0 ] },
-        "up": { "texture": "fornow", "uv": [ 0.0, 0.0, 15.9, 15.0 ] },
-        "down": { "texture": "fornow", "uv": [ 0.0, 1.0, 15.9, 16.0 ] }
+        "north": { "texture": "wood", "uv": [ 0.0, 6.0, 16.0, 7.5 ] },
+        "east": { "texture": "wood", "uv": [ 0.0, 6.0, 16.0, 7.5 ] },
+        "south": { "texture": "wood", "uv": [ 0.0, 6.0, 16.0, 7.5 ] },
+        "west": { "texture": "wood", "uv": [ 0.0, 6.0, 16.0, 7.5 ] },
+        "up": { "texture": "wood", "uv": [ 0.0, 0.0, 16.0, 16.0 ] },
+        "down": { "texture": "wood", "uv": [ 0.0, 0.0, 16.0, 16.0 ] }
       }
     },
     {
       "name": "Back_Down",
       "from": [ 0.0, 10.0, 0.0 ],
-      "to": [ 16.0, 16.0, 2.0 ],
+      "to": [ 16.0, 16.0, 1.5 ],
       "faces": {
-        "north": { "texture": "fornow", "uv": [ 0.0, 0.0, 16.0, 6.0 ] },
-        "east": { "texture": "fornow", "uv": [ 14.0, 0.0, 16.0, 6.0 ] },
-        "south": { "texture": "fornow", "uv": [ 0.0, 0.0, 16.0, 6.0 ] },
-        "up": { "texture": "fornow", "uv": [ 0.0, 0.0, 16.0, 2.0 ] }
+        "north": { "texture": "wood", "uv": [ 0.0, 0.0, 16.0, 6.0 ] },
+        "east": { "texture": "wood", "uv": [ 14.5, 0.0, 16.0, 6.0 ] },
+        "south": { "texture": "wood", "uv": [ 0.0, 0.0, 16.0, 6.0 ] },
+        "west": { "texture": "wood", "uv": [ 0.0, 0.0, 1.5, 6.0 ] },
+        "up": { "texture": "wood", "uv": [ 0.0, 0.0, 16.0, 1.5 ] }
+      }
+    },
+    {
+      "name": "Board_NorthSouth",
+      "from": [ 0.0, 11.0, 0.0 ],
+      "to": [ 15.9, 12.0, 16.0 ],
+      "rotation": { "origin": [ 8.0, 11.0, 10.0 ], "axis": "x", "angle": 22.5 },
+      "faces": {
+        "east": { "texture": "planks", "uv": [ 0.0, 0.0, 16.0, 1.0 ] },
+        "west": { "texture": "planks", "uv": [ 0.0, 0.0, 16.0, 1.0 ] },
+        "up": { "texture": "planks", "uv": [ 0.0, 0.0, 15.9, 16.0 ] },
+        "down": { "texture": "planks", "uv": [ 0.0, 0.0, 15.9, 16.0 ] }
+      }
+    },
+    {
+      "name": "LegNW_Up",
+      "from": [ 0.0, 0.0, 0.0 ],
+      "to": [ 1.5, 8.5, 1.5 ],
+      "faces": {
+        "north": { "texture": "wood", "uv": [ 14.5, 7.5, 16.0, 16.0 ] },
+        "east": { "texture": "wood", "uv": [ 14.5, 7.5, 16.0, 16.0 ] },
+        "south": { "texture": "wood", "uv": [ 0.0, 7.5, 1.5, 16.0 ] },
+        "west": { "texture": "wood", "uv": [ 0.0, 7.5, 1.5, 16.0 ] },
+        "down": { "texture": "wood", "uv": [ 0.0, 14.5, 1.5, 16.0 ] }
+      }
+    },
+    {
+      "name": "LegNE_Up",
+      "from": [ 14.5, 0.0, 0.0 ],
+      "to": [ 16.0, 8.5, 1.5 ],
+      "faces": {
+        "north": { "texture": "wood", "uv": [ 0.0, 7.5, 1.5, 16.0 ] },
+        "east": { "texture": "wood", "uv": [ 14.5, 7.5, 16.0, 16.0 ] },
+        "south": { "texture": "wood", "uv": [ 14.5, 7.5, 16.0, 16.0 ] },
+        "west": { "texture": "wood", "uv": [ 0.0, 7.5, 1.5, 16.0 ] },
+        "down": { "texture": "wood", "uv": [ 14.5, 14.5, 16.0, 16.0 ] }
+      }
+    },
+    {
+      "name": "LegSE_Up",
+      "from": [ 14.5, 0.0, 14.5 ],
+      "to": [ 16.0, 8.5, 16.0 ],
+      "faces": {
+        "north": { "texture": "wood", "uv": [ 0.0, 7.5, 1.5, 16.0 ] },
+        "east": { "texture": "wood", "uv": [ 0.0, 7.5, 1.5, 16.0 ] },
+        "south": { "texture": "wood", "uv": [ 14.5, 7.5, 16.0, 16.0 ] },
+        "west": { "texture": "wood", "uv": [ 14.5, 7.5, 16.0, 16.0 ] },
+        "down": { "texture": "wood", "uv": [ 14.5, 0.0, 16.0, 1.5 ] }
+      }
+    },
+    {
+      "name": "LegSW_Up",
+      "from": [ 0.0, 0.0, 14.5 ],
+      "to": [ 1.5, 8.5, 16.0 ],
+      "faces": {
+        "north": { "texture": "wood", "uv": [ 14.5, 7.5, 16.0, 16.0 ] },
+        "east": { "texture": "wood", "uv": [ 0.0, 7.5, 1.5, 16.0 ] },
+        "south": { "texture": "wood", "uv": [ 0.0, 7.5, 1.5, 16.0 ] },
+        "west": { "texture": "wood", "uv": [ 14.5, 7.5, 16.0, 16.0 ] },
+        "down": { "texture": "wood", "uv": [ 0.0, 0.0, 1.5, 1.5 ] }
+      }
+    },
+    {
+      "name": "MiddleBarS_NorthWestEast",
+      "from": [ 1.5, 4.0, 15.0 ],
+      "to": [ 14.5, 4.5, 15.75 ],
+      "faces": {
+        "south": { "texture": "wood", "uv": [ 1.5, 11.5, 14.5, 12.0 ] },
+        "up": { "texture": "wood", "uv": [ 1.5, 10.25, 14.5, 11.0 ] },
+        "down": { "texture": "wood", "uv": [ 1.5, 10.25, 14.5, 11.0 ] }
+      }
+    },
+    {
+      "name": "MiddleBarN_SouthWestEast",
+      "from": [ 1.5, 4.0, 0.25 ],
+      "to": [ 14.5, 4.5, 1.0 ],
+      "faces": {
+        "north": { "texture": "wood", "uv": [ 1.5, 11.5, 14.5, 12.0 ] },
+        "up": { "texture": "wood", "uv": [ 1.5, 10.25, 14.5, 11.0 ] },
+        "down": { "texture": "wood", "uv": [ 1.5, 10.25, 14.5, 11.0 ] }
+      }
+    },
+    {
+      "name": "MiddleBarE_WestNorthSouth",
+      "from": [ 15.0, 4.0, 1.5 ],
+      "to": [ 15.75, 4.5, 14.5 ],
+      "faces": {
+        "east": { "texture": "wood", "uv": [ 1.5, 11.5, 14.5, 12.0 ] },
+        "up": { "texture": "wood", "uv": [ 0.0, 1.5, 0.75, 14.5 ] },
+        "down": { "texture": "wood", "uv": [ 1.0, 1.5, 1.75, 14.5 ] }
+      }
+    },
+    {
+      "name": "MiddleBarW_EastNorthSouth",
+      "from": [ 0.25, 4.0, 1.5 ],
+      "to": [ 1.0, 4.5, 14.5 ],
+      "faces": {
+        "west": { "texture": "wood", "uv": [ 1.5, 11.5, 14.5, 12.0 ] },
+        "up": { "texture": "wood", "uv": [ 0.25, 1.5, 1.0, 14.5 ] },
+        "down": { "texture": "wood", "uv": [ 1.25, 1.5, 2.0, 14.5 ] }
+      }
+    },
+    {
+      "name": "DrawerKnobU_North",
+      "from": [ 7.0, 6.0, 15.0 ],
+      "to": [ 9.0, 7.0, 16.0 ],
+      "faces": {
+        "east": { "texture": "chest", "uv": [ 0.0, 0.5, 0.25, 0.75 ] },
+        "south": { "texture": "chest", "uv": [ 0.0, 0.25, 0.25, 0.75 ], "rotation": 90 },
+        "west": { "texture": "chest", "uv": [ 0.0, 0.25, 0.25, 0.5 ] },
+        "up": { "texture": "chest", "uv": [ 0.0, 0.25, 0.25, 0.75 ], "rotation": 90 },
+        "down": { "texture": "chest", "uv": [ 0.0, 0.25, 0.25, 0.75 ], "rotation": 90 }
+      }
+    },
+    {
+      "name": "DrawerKnobD_North",
+      "from": [ 7.0, 1.5, 15.0 ],
+      "to": [ 9.0, 2.5, 16.0 ],
+      "faces": {
+        "east": { "texture": "chest", "uv": [ 0.0, 0.5, 0.25, 0.75 ] },
+        "south": { "texture": "chest", "uv": [ 0.0, 0.25, 0.25, 0.75 ], "rotation": 90 },
+        "west": { "texture": "chest", "uv": [ 0.0, 0.25, 0.25, 0.5 ] },
+        "up": { "texture": "chest", "uv": [ 0.0, 0.25, 0.25, 0.75 ], "rotation": 90 },
+        "down": { "texture": "chest", "uv": [ 0.0, 0.25, 0.25, 0.75 ], "rotation": 90 }
+      }
+    },
+    {
+      "name": "DrawersU",
+      "from": [ 1.5, 4.5, 1.5 ],
+      "to": [ 14.5, 8.5, 15.5 ],
+      "faces": {
+        "north": { "texture": "chest", "uv": [ 10.625, 3.625, 13.875, 4.625 ] },
+        "east": { "texture": "chest", "uv": [ 7.0, 3.625, 10.5, 4.625 ] },
+        "south": { "texture": "chest", "uv": [ 3.625, 3.625, 6.875, 4.625 ] },
+        "west": { "texture": "chest", "uv": [ 0.0, 3.625, 3.5, 4.625 ] },
+        "up": { "texture": "chest", "uv": [ 7.125, 0.0, 10.375, 3.5 ] },
+        "down": { "texture": "chest", "uv": [ 3.625, 0.0, 6.875, 3.5 ] }
+      }
+    },
+    {
+      "name": "DrawersD",
+      "from": [ 1.5, 0.0, 1.5 ],
+      "to": [ 14.5, 4.0, 15.5 ],
+      "faces": {
+        "north": { "texture": "chest", "uv": [ 10.625, 3.625, 13.875, 4.625 ] },
+        "east": { "texture": "chest", "uv": [ 7.0, 3.625, 10.5, 4.625 ] },
+        "south": { "texture": "chest", "uv": [ 3.625, 3.625, 6.875, 4.625 ] },
+        "west": { "texture": "chest", "uv": [ 0.0, 3.625, 3.5, 4.625 ] },
+        "up": { "texture": "chest", "uv": [ 7.125, 0.0, 10.375, 3.5 ] },
+        "down": { "texture": "chest", "uv": [ 3.625, 0.0, 6.875, 3.5 ] }
+      }
+    },
+    {
+      "name": "SideW_NorthEastSouthUp",
+      "from": [ 0.5, 0.0, 1.5 ],
+      "to": [ 1.5, 8.5, 14.5 ],
+      "faces": {
+        "west": { "texture": "planks", "uv": [ 1.5, 7.5, 14.5, 16.0 ] },
+        "down": { "texture": "planks", "uv": [ 0.0, 1.5, 1.0, 14.5 ] }
+      }
+    },
+    {
+      "name": "SideE_NorthSouthWestUp",
+      "from": [ 14.5, 0.0, 1.5 ],
+      "to": [ 15.5, 8.5, 14.5 ],
+      "faces": {
+        "east": { "texture": "planks", "uv": [ 1.5, 7.5, 14.5, 16.0 ] },
+        "down": { "texture": "planks", "uv": [ 14.5, 1.5, 15.5, 14.5 ] }
+      }
+    },
+    {
+      "name": "SideN_EastSouthWestUp",
+      "from": [ 1.5, 0.0, 0.5 ],
+      "to": [ 14.5, 8.5, 1.5 ],
+      "faces": {
+        "north": { "texture": "planks", "uv": [ 1.5, 7.5, 14.5, 16.0 ] },
+        "down": { "texture": "planks", "uv": [ 1.5, 0.0, 14.5, 1.0 ] }
       }
     }
   ]
