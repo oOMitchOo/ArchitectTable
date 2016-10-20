@@ -34,7 +34,7 @@ public class ItemBlockArchitectTable extends ItemBlock{
         IBlockState iblockstate = worldIn.getBlockState(pos);
         Block block = iblockstate.getBlock();
 
-        // Wenn der geklickt Block nicht replaceable ist, wird der gesetzt Block an die Seite des geklickten Blocks gesetzt.
+        // Wenn der geklickte Block nicht replaceable ist, wird der gesetzt Block an die Seite des geklickten Blocks gesetzt.
         if (!block.isReplaceable(worldIn, pos))
         {
             pos = pos.offset(facing);

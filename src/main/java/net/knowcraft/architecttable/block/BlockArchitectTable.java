@@ -10,6 +10,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -41,9 +42,9 @@ public class BlockArchitectTable extends BlockBase {
     public static final PropertyEnum<EnumFacing> FACING = PropertyEnum.create("facing", EnumFacing.class);
     private static final AxisAlignedBB TABLE_COLLIDING_BB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.8125D, 1.0D);
     private static final AxisAlignedBB TABLE_SELECTING_BB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.625D, 1.0D);
-    // Bounding boxes for: pinboard_left south, west, north, east then pinboard_right south, west, north east.
-    private static final AxisAlignedBB[] PINBOARD_COLLIDING_BB = new AxisAlignedBB[] {new AxisAlignedBB(0.03125D, 0.03125D, 0.0D, 1.0D, 0.96875D, 0.0625D), new AxisAlignedBB(0.9375D, 0.03125D, 0.03125D, 1.0D, 0.96875D, 1.0D), new AxisAlignedBB(0.0D, 0.03125D, 0.9375D, 0.96875D, 0.96875D, 1.0D), new AxisAlignedBB(0.0D, 0.03125D, 0.0D, 0.0625D, 0.96875D, 0.96875D), new AxisAlignedBB(0.0D, 0.03125D, 0.0D, 0.96875D, 0.96875D, 0.0625D), new AxisAlignedBB(0.9375D, 0.03125D, 0.0D, 1.0D, 0.96875D, 0.96875D), new AxisAlignedBB(0.03125D, 0.03125D, 0.9375D, 1.0D, 0.96875D, 1.0D), new AxisAlignedBB(0.0D, 0.03125D, 0.03125D, 0.0625D, 0.96875D, 1.0D)};
-    private static final AxisAlignedBB[] PINBOARD_SELECTING_BB = new AxisAlignedBB[] {new AxisAlignedBB(0.03125D, 0.03125D, 0.0D, 1.96875D, 0.96875D, 0.0625D), new AxisAlignedBB(0.9375D, 0.03125D, 0.03125D, 1.0D, 0.96875D, 1.96875D), new AxisAlignedBB(0.03125D, 0.03125D, 0.9375D, 1.96875D, 0.96875D, 1.0D), new AxisAlignedBB(0.0D, 0.03125D, 0.03125D, 0.0625D, 0.96875D, 1.96875D)};
+    // Bounding boxes for: pinboard_left N-S-W-E then pinboard_right N-S-W-E.
+    private static final AxisAlignedBB[] PINBOARD_COLLIDING_BB = new AxisAlignedBB[] {new AxisAlignedBB(0.0D, 0.03125D, 0.9375D, 0.96875D, 0.96875D, 1.0D), new AxisAlignedBB(0.03125D, 0.03125D, 0.0D, 1.0D, 0.96875D, 0.0625D), new AxisAlignedBB(0.9375D, 0.03125D, 0.03125D, 1.0D, 0.96875D, 1.0D), new AxisAlignedBB(0.0D, 0.03125D, 0.0D, 0.0625D, 0.96875D, 0.96875D), new AxisAlignedBB(0.03125D, 0.03125D, 0.9375D, 1.0D, 0.96875D, 1.0D), new AxisAlignedBB(0.0D, 0.03125D, 0.0D, 0.96875D, 0.96875D, 0.0625D), new AxisAlignedBB(0.9375D, 0.03125D, 0.0D, 1.0D, 0.96875D, 0.96875D), new AxisAlignedBB(0.0D, 0.03125D, 0.03125D, 0.0625D, 0.96875D, 1.0D)};
+    private static final AxisAlignedBB[] PINBOARD_SELECTING_BB = new AxisAlignedBB[] {new AxisAlignedBB(0.03125D, 0.03125D, 0.9375D, 1.96875D, 0.96875D, 1.0D), new AxisAlignedBB(0.03125D, 0.03125D, 0.0D, 1.96875D, 0.96875D, 0.0625D), new AxisAlignedBB(0.9375D, 0.03125D, 0.03125D, 1.0D, 0.96875D, 1.96875D), new AxisAlignedBB(0.0D, 0.03125D, 0.03125D, 0.0625D, 0.96875D, 1.96875D)};
 
     public BlockArchitectTable(String unlName, String regName) {
         super(Material.WOOD, unlName, regName);
@@ -98,11 +99,11 @@ public class BlockArchitectTable extends BlockBase {
                     case UP: // Should not be possible.
                         break;
                     case NORTH:
-                        return PINBOARD_COLLIDING_BB[2];
-                    case SOUTH:
                         return PINBOARD_COLLIDING_BB[0];
-                    case WEST:
+                    case SOUTH:
                         return PINBOARD_COLLIDING_BB[1];
+                    case WEST:
+                        return PINBOARD_COLLIDING_BB[2];
                     case EAST:
                         return PINBOARD_COLLIDING_BB[3];
                 }
@@ -113,15 +114,15 @@ public class BlockArchitectTable extends BlockBase {
                     case UP: // Should not be possible.
                         break;
                     case NORTH:
-                        return PINBOARD_COLLIDING_BB[6];
-                    case SOUTH:
                         return PINBOARD_COLLIDING_BB[4];
-                    case WEST:
+                    case SOUTH:
                         return PINBOARD_COLLIDING_BB[5];
+                    case WEST:
+                        return PINBOARD_COLLIDING_BB[6];
                     case EAST:
                         return PINBOARD_COLLIDING_BB[7];
                 }
-            default: return TABLE_COLLIDING_BB; // table_left and table_right
+            default: return TABLE_COLLIDING_BB; // table_left (meta 0) and table_right (meta 1)
         }
     }
 
@@ -142,11 +143,11 @@ public class BlockArchitectTable extends BlockBase {
                     case UP: // Should not be possible.
                         break;
                     case NORTH:
-                        return PINBOARD_SELECTING_BB[2].offset(pos.west());
+                        return PINBOARD_SELECTING_BB[0].offset(pos.west());
                     case SOUTH:
-                        return PINBOARD_SELECTING_BB[0].offset(pos);
-                    case WEST:
                         return PINBOARD_SELECTING_BB[1].offset(pos);
+                    case WEST:
+                        return PINBOARD_SELECTING_BB[2].offset(pos);
                     case EAST:
                         return PINBOARD_SELECTING_BB[3].offset(pos.north());
                 }
@@ -157,15 +158,15 @@ public class BlockArchitectTable extends BlockBase {
                     case UP: // Should not be possible.
                         break;
                     case NORTH:
-                        return PINBOARD_SELECTING_BB[2].offset(pos);
+                        return PINBOARD_SELECTING_BB[0].offset(pos);
                     case SOUTH:
-                        return PINBOARD_SELECTING_BB[0].offset(pos.west());
+                        return PINBOARD_SELECTING_BB[1].offset(pos.west());
                     case WEST:
-                        return PINBOARD_SELECTING_BB[1].offset(pos.north());
+                        return PINBOARD_SELECTING_BB[2].offset(pos.north());
                     case EAST:
                         return PINBOARD_SELECTING_BB[3].offset(pos);
                 }
-            default: return TABLE_SELECTING_BB.offset(pos); // table_left and table_right - smaller selectingBox (in y) than collidingBox.
+            default: return TABLE_SELECTING_BB.offset(pos); // table_left (meta 0) and table_right (meta 1) - smaller selectingBox (in y) than collidingBox.
         }
     }
 
@@ -173,8 +174,8 @@ public class BlockArchitectTable extends BlockBase {
     @Override
     protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, new IProperty[] {PART, FACING}); }
 
-    // This is called from the ItemBlock class, when the (multi)block is placed into the world to get the BlockState for the placed block.
-    // We are always placing the multiBlock by placing the table_left.
+    /** This is called from the ItemBlock class, when the (multi)block is placed into the world to get the BlockState for the placed block.
+    /* We are always placing the multiBlock by placing the table_left. */
     @Override
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
@@ -199,7 +200,7 @@ public class BlockArchitectTable extends BlockBase {
         }
     }
 
-    /**Convert the BlockState into the correct metadata value*/
+    /** Convert the BlockState into the correct metadata value */
     @Override
     public int getMetaFromState(IBlockState state) { return state.getValue(PART).getMetadata(); }
 
@@ -219,75 +220,44 @@ public class BlockArchitectTable extends BlockBase {
         }
     }
 
+    /** Helping method for finding out in which direction the next architectTableBlock lies. */
+    private EnumFacing getDirectionOfNeighborArchTableBlock(IBlockAccess worldIn, BlockPos pos) {
+        if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
+            return EnumFacing.NORTH;
+        } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
+            return EnumFacing.SOUTH;
+        } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
+            return EnumFacing.WEST;
+        } else return EnumFacing.EAST; // Every ArchTableBlock must have a neighboring ArchTableBlock. Last possibility is east.
+    }
 
-    // TODO: AB HIER WEITER! Aufräumen...
     /** Must be defined because only the PART of the blocks are saved in the world data (in form of the meta value 0/1/2/3).
     /* Without it the blocks would always face south. */
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
         int partMeta = this.getMetaFromState(state);
-
-        if (partMeta == 0) {
-            // partMeta 0 means this is table_left.
-            // Die Richtung, in der der table_right davon liegt, bestimmt die Richtung des MultiBlocks.
-            if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
-            } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
-            } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
-            } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
-               return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
-            } else {
-                // Should not be possible.
-                return this.getDefaultState();
-        }
-        } else if (partMeta == 1) {
-            // partMeta 1 means this is table_right.
-            if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
-            } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
-            } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
-            } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
-            } else {
-                // Should not be possible.
-                return this.getStateFromMeta(partMeta);
-            }
-        } else if (partMeta == 2) {
-            // partMeta 2 means this is pinboard_left.
-            if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
-            } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
-            } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
-            } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
-            } else {
-                // Should not be possible.
-                return this.getStateFromMeta(partMeta);
-            }
-        } else if (partMeta == 3) {
-            // partMeta 3 means this is pinboard_right.
-            if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
-            } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
-            } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
-            } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
-                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
-            } else {
-                // Should not be possible.
-                return this.getStateFromMeta(partMeta);
-            }
-        } else {
-            // Should not be possible.
-            return this.getDefaultState();
+        EnumFacing directionNextArchTable = getDirectionOfNeighborArchTableBlock(worldIn, pos);
+        // This is returning the multiBlockFacing for every part of the architect table. Example (bird's eye view):
+        //  #----#----#----#----#
+        //  |    |    |    |    |        N
+        //  #----#----#----#----#        |
+        //  |    |  x | rt |    |   W----|----E
+        //  #----#----#----#----#        |
+        //  |    |    |    |    |        S
+        //  #----#----#----#----#
+        // Let the block at position pos (x) be left_table (partMeta=0) and the block at position rt be right_table.
+        // Then directionNextArchTable is East and left_table should face South (East.rotateY()).
+        switch (partMeta) {
+            case 0: // table_left
+                return this.getStateFromMeta(partMeta).withProperty(FACING, directionNextArchTable.rotateY());
+            case 1: // table_right
+                return this.getStateFromMeta(partMeta).withProperty(FACING, directionNextArchTable.getOpposite().rotateY());
+            case 2: // pinboard_left
+                return this.getStateFromMeta(partMeta).withProperty(FACING, directionNextArchTable.rotateY());
+            case 3: // pinboard_right
+                return this.getStateFromMeta(partMeta).withProperty(FACING, directionNextArchTable.getOpposite().rotateY());
+            default: return this.getDefaultState(); // Should not be possible.
         }
     }
 
@@ -305,55 +275,70 @@ public class BlockArchitectTable extends BlockBase {
         // We need to getActualState so the facing fits the actual multiBlockFacing.
         state = this.getActualState(state, worldIn, pos);
         int partMeta = state.getValue(PART).getMetadata();
-        // S-W-N-E ist 0-1-2-3
-        int facingIndex = state.getValue(FACING).getHorizontalIndex();
-        int yOffset = 1;
-        int sideOffset = 1;
-
+        int yOffset = 0;
+        int sideOffset = 0;
+        boolean dropItems = true;
 
         // Part und Facing bestimmt wie zerstört wird.
         // Für oben muss unten zerstört werden (& vice versa) // Für links muss rechts zerstört werden (& vice versa).
         //
         //     #---#---#
-        //     | 2 | 3 |
-        //     #---#---#   Für yOffset = 1 und sideOffset = 1 werden {1,2,3} zerstört.
+        //     | 2 | 3 |    If 0 is the position of pos, yOffset = 1 and sideOffset = 1,
+        //     #---#---#    then the blocks on position 1,2,3 will be destroyed.
         //     | 0 | 1 |
         //     #---#---#
         //
-        // x- und y-Offset verschiebt und/oder spiegelt die 3 Zerstör-Positionen
-        if (partMeta == 0) {
-            yOffset = 1;
-            sideOffset = 1;
-            // Vielleicht falsch, da destroyBlock wohl dropBlockAsItem macht.
-            // worldIn.destroyBlock(pos.east(),true);
-            // worldIn.destroyBlock(pos.up(), true);
-        } else if (partMeta == 1) {
-            yOffset = 1;
-            sideOffset = -1;
-        } else if (partMeta == 2) {
-            yOffset = -1;
-            sideOffset = 1;
-        } else if (partMeta == 3) {
-            yOffset = -1;
-            sideOffset = -1;
+        // yOffset and sideOffset moves which three blocks around pos get destroyed.
+
+        switch (partMeta) {
+            case 0: // table_left
+                yOffset = 1;
+                sideOffset = 1;
+                break;
+            case 1: // table_right
+                yOffset = 1;
+                sideOffset = -1;
+                break;
+            case 2: // pinboard_left
+                yOffset = -1;
+                sideOffset = 1;
+                break;
+            case 3: // pinboard_right
+                yOffset = -1;
+                sideOffset = -1;
+                break;
         }
-         if (facingIndex == 0) {
-            // Facing South
-            worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
-            worldIn.destroyBlock(pos.add(sideOffset, 0, 0), true);
-            worldIn.destroyBlock(pos.add(sideOffset, yOffset, 0), true);
-        } else if (facingIndex == 1) {
-            worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
-            worldIn.destroyBlock(pos.add(0, 0, sideOffset), true);
-            worldIn.destroyBlock(pos.add(0, yOffset, sideOffset), true);
-        } else if (facingIndex == 2) {
-            worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
-            worldIn.destroyBlock(pos.add(-sideOffset, 0, 0), true);
-            worldIn.destroyBlock(pos.add(-sideOffset, yOffset, 0), true);
-        } else if (facingIndex == 3) {
-            worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
-            worldIn.destroyBlock(pos.add(0, 0, -sideOffset), true);
-            worldIn.destroyBlock(pos.add(0, yOffset, -sideOffset), true);
+
+        // Don't get any dropped Items, if the destroyingPlayer (more accurate: the player closest by) is in creative. WARNING: Could be buggy with more than one player nearby both in different playing modes.
+        EntityPlayer destroyingPlayer = worldIn.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 7.0D, false); // false looks for not-spectators.
+        if (destroyingPlayer != null) if(destroyingPlayer.isCreative()) dropItems = false;
+
+        // TODO: This could use some tidy up.
+        switch (state.getValue(FACING)) { // multiBlockFacing
+            case DOWN: // Should not be possible.
+                break;
+            case UP: // Should not be possible.
+                break;
+            case NORTH:
+                worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
+                worldIn.destroyBlock(pos.add(-sideOffset, 0, 0), dropItems);
+                worldIn.destroyBlock(pos.add(-sideOffset, yOffset, 0), dropItems);
+                break;
+            case SOUTH:
+                worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
+                worldIn.destroyBlock(pos.add(sideOffset, 0, 0), dropItems);
+                worldIn.destroyBlock(pos.add(sideOffset, yOffset, 0), dropItems);
+                break;
+            case WEST:
+                worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
+                worldIn.destroyBlock(pos.add(0, 0, sideOffset), dropItems);
+                worldIn.destroyBlock(pos.add(0, yOffset, sideOffset), dropItems);
+                break;
+            case EAST:
+                worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
+                worldIn.destroyBlock(pos.add(0, 0, -sideOffset), dropItems);
+                worldIn.destroyBlock(pos.add(0, yOffset, -sideOffset), dropItems);
+                break;
         }
     }
 

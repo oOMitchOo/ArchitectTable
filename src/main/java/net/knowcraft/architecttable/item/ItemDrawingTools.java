@@ -37,6 +37,8 @@ public class ItemDrawingTools extends ItemBase{
             if(worldIn.getBlockState(pos).getValue(BlockPlanks.VARIANT) == BlockPlanks.EnumType.OAK) {
                 boolean builtMultiBlock = checkAndBuildMultiBlock(playerIn, worldIn, pos);
                 if (builtMultiBlock) {
+                    // Remove the drawingTool Item, if the player isn't in creative.
+                    if (!playerIn.isCreative() && (stack.getItem() instanceof ItemDrawingTools)) stack.stackSize = stack.stackSize -1;
                     return EnumActionResult.PASS;
                 } else {
                     return EnumActionResult.FAIL;
