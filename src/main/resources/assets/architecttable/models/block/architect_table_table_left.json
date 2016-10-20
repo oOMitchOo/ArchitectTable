@@ -103,36 +103,6 @@
       }
     },
     {
-      "name": "MiddleBarN_SouthWestEast",
-      "from": [ 1.5, 4.0, 0.25 ],
-      "to": [ 14.5, 4.5, 1.0 ],
-      "faces": {
-        "north": { "texture": "wood", "uv": [ 1.5, 11.5, 14.5, 12.0 ] },
-        "up": { "texture": "wood", "uv": [ 1.5, 10.25, 14.5, 11.0 ] },
-        "down": { "texture": "wood", "uv": [ 1.5, 10.25, 14.5, 11.0 ] }
-      }
-    },
-    {
-      "name": "MiddleBarE_WestNorthSouth",
-      "from": [ 15.0, 4.0, 1.5 ],
-      "to": [ 15.75, 4.5, 14.5 ],
-      "faces": {
-        "east": { "texture": "wood", "uv": [ 1.5, 11.5, 14.5, 12.0 ] },
-        "up": { "texture": "wood", "uv": [ 0.0, 1.5, 0.75, 14.5 ] },
-        "down": { "texture": "wood", "uv": [ 1.0, 1.5, 1.75, 14.5 ] }
-      }
-    },
-    {
-      "name": "MiddleBarW_EastNorthSouth",
-      "from": [ 0.25, 4.0, 1.5 ],
-      "to": [ 1.0, 4.5, 14.5 ],
-      "faces": {
-        "west": { "texture": "wood", "uv": [ 1.5, 11.5, 14.5, 12.0 ] },
-        "up": { "texture": "wood", "uv": [ 0.25, 1.5, 1.0, 14.5 ] },
-        "down": { "texture": "wood", "uv": [ 1.25, 1.5, 2.0, 14.5 ] }
-      }
-    },
-    {
       "name": "DrawerKnobU_North",
       "from": [ 7.0, 6.0, 15.0 ],
       "to": [ 9.0, 7.0, 16.0 ],

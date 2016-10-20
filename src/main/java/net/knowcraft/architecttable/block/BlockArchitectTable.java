@@ -72,7 +72,7 @@ public class BlockArchitectTable extends BlockBase {
         return false;
     }
 
-    // WARNUNG: Könnte bald veraltet sein.
+    // Determines with which damage value the items are dropped, when the multiBlock is broken.
     @Override
     public int damageDropped(IBlockState state)
     {
@@ -81,294 +81,281 @@ public class BlockArchitectTable extends BlockBase {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
-    {
-        list.add(new ItemStack(itemIn, 1, 0));
-    }
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) { list.add(new ItemStack(itemIn, 1, 0)); } // We don't want any SubBlocks besides the left_table (in the creativeTab).
 
-    // Gibt ja nach BlockState die BoundingBox aus. Die Pinboardhälften sind keine ganzen Blöcke.
+    /** The boundingBoxes determine the colliding with the blocks. */
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
     {
+        // getActualState to get the proper facing before proceeding.
         state = this.getActualState(state, source, pos);
 
-        if (this.getMetaFromState(state) == 0 || this.getMetaFromState(state) == 1) {
-            return TABLE_COLLIDING_BB;
-        } else if (this.getMetaFromState(state) == 2) {
-            // if lookin south
-            if (state.getValue(FACING) == EnumFacing.SOUTH) {
-                return PINBOARD_COLLIDING_BB[0];
-            } else if (state.getValue(FACING) == EnumFacing.WEST) {
-                return PINBOARD_COLLIDING_BB[1];
-            } else if (state.getValue(FACING) == EnumFacing.NORTH) {
-                return PINBOARD_COLLIDING_BB[2];
-            } else {
-                // Didn't check for facing east, because up and down should never appear.
-                return PINBOARD_COLLIDING_BB[3];
-            }
-        } else if (this.getMetaFromState(state) == 3) {
-            if (state.getValue(FACING) == EnumFacing.SOUTH) {
-                return PINBOARD_COLLIDING_BB[4];
-            } else if (state.getValue(FACING) == EnumFacing.WEST) {
-                return PINBOARD_COLLIDING_BB[5];
-            } else if (state.getValue(FACING) == EnumFacing.NORTH) {
-                return PINBOARD_COLLIDING_BB[6];
-            } else {
-                // Didn't check for facing east, because up and down should never appear.
-                return PINBOARD_COLLIDING_BB[7];
-            }
-        } else {
-            // Should not be possible.
-            return FULL_BLOCK_AABB;
+        switch (this.getMetaFromState(state)) {
+            case 2: // pinboard_left
+                switch (state.getValue(FACING)) {
+                    case DOWN: // Should not be possible.
+                        break;
+                    case UP: // Should not be possible.
+                        break;
+                    case NORTH:
+                        return PINBOARD_COLLIDING_BB[2];
+                    case SOUTH:
+                        return PINBOARD_COLLIDING_BB[0];
+                    case WEST:
+                        return PINBOARD_COLLIDING_BB[1];
+                    case EAST:
+                        return PINBOARD_COLLIDING_BB[3];
+                }
+            case 3: // pinboard_right
+                switch (state.getValue(FACING)) {
+                    case DOWN: // Should not be possible.
+                        break;
+                    case UP: // Should not be possible.
+                        break;
+                    case NORTH:
+                        return PINBOARD_COLLIDING_BB[6];
+                    case SOUTH:
+                        return PINBOARD_COLLIDING_BB[4];
+                    case WEST:
+                        return PINBOARD_COLLIDING_BB[5];
+                    case EAST:
+                        return PINBOARD_COLLIDING_BB[7];
+                }
+            default: return TABLE_COLLIDING_BB; // table_left and table_right
         }
     }
 
+    /** The selectedBoundingBox is the black lines when looking at a block.
+    /* They must all be offset by the BlockPos of the block which is been looked at. (rendering stuff) */
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos)
     {
+        // getActualState to get the proper facing before proceeding.
         state = this.getActualState(state, worldIn, pos);
-        // If the block is table_left or table_right the selectBoundingBox should be a bit smaller (in y) than the collisionBoundinBox.
-        if (this.getMetaFromState(state) == 0 || this.getMetaFromState(state) == 1) {
-            // Those are table_left and table_right
-            return TABLE_SELECTING_BB.offset(pos);
-        } else if (this.getMetaFromState(state) == 2) {
-            // No more split selectBoundingBox for the pinboard_left.
-            if (state.getValue(FACING) == EnumFacing.SOUTH) {
-                return PINBOARD_SELECTING_BB[0].offset(pos);
-            } else if (state.getValue(FACING) == EnumFacing.WEST) {
-                return PINBOARD_SELECTING_BB[1].offset(pos);
-            } else if (state.getValue(FACING) == EnumFacing.NORTH) {
-                return PINBOARD_SELECTING_BB[2].offset(pos.west());
-            } else {
-                // Ist facing east.
-                return PINBOARD_SELECTING_BB[3].offset(pos.north());
-            }
-        } else if (this.getMetaFromState(state) == 3) {
-            // No more split selectBoundingBox for the pinboard_right.
-            if (state.getValue(FACING) == EnumFacing.SOUTH) {
-                return PINBOARD_SELECTING_BB[0].offset(pos.west());
-            } else if (state.getValue(FACING) == EnumFacing.WEST) {
-                return PINBOARD_SELECTING_BB[1].offset(pos.north());
-            } else if (state.getValue(FACING) == EnumFacing.NORTH) {
-                return PINBOARD_SELECTING_BB[2].offset(pos);
-            } else {
-                // Ist facing east.
-                return PINBOARD_SELECTING_BB[3].offset(pos);
-            }
-        } else {
-            // should not be possible
-            return state.getBoundingBox(worldIn, pos).offset(pos);
+
+        switch (this.getMetaFromState(state)) {
+            case 2: // pinboard_left - the selectingBB goes over both halfs of the pinboard. (no more dividing the pinboard when looking at it)
+                switch (state.getValue(FACING)) {
+                    case DOWN: // Should not be possible.
+                        break;
+                    case UP: // Should not be possible.
+                        break;
+                    case NORTH:
+                        return PINBOARD_SELECTING_BB[2].offset(pos.west());
+                    case SOUTH:
+                        return PINBOARD_SELECTING_BB[0].offset(pos);
+                    case WEST:
+                        return PINBOARD_SELECTING_BB[1].offset(pos);
+                    case EAST:
+                        return PINBOARD_SELECTING_BB[3].offset(pos.north());
+                }
+            case 3: // pinboard_right - the selectingBB goes over both halfs of the pinboard. (no more dividing the pinboard when looking at it)
+                switch (state.getValue(FACING)) {
+                    case DOWN: // Should not be possible.
+                        break;
+                    case UP: // Should not be possible.
+                        break;
+                    case NORTH:
+                        return PINBOARD_SELECTING_BB[2].offset(pos);
+                    case SOUTH:
+                        return PINBOARD_SELECTING_BB[0].offset(pos.west());
+                    case WEST:
+                        return PINBOARD_SELECTING_BB[1].offset(pos.north());
+                    case EAST:
+                        return PINBOARD_SELECTING_BB[3].offset(pos);
+                }
+            default: return TABLE_SELECTING_BB.offset(pos); // table_left and table_right - smaller selectingBox (in y) than collidingBox.
         }
     }
 
+    /** This must be overriden for every block with properties. */
     @Override
-    protected BlockStateContainer createBlockState()
-    {
-        //IProperty[] properties = new IProperty[2];
-        //properties[0] = PART;
-        //properties[1] = FACING;
-        return new BlockStateContainer(this, new IProperty[] {PART, FACING});
-    }
+    protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, new IProperty[] {PART, FACING}); }
 
-    // Wird direkt aufgerufen, um die genaue BlockState zu erfassen, wenn der Block das BlockItems (mit placeBlockAt()) gesetzt wird.
+    // This is called from the ItemBlock class, when the (multi)block is placed into the world to get the BlockState for the placed block.
+    // We are always placing the multiBlock by placing the table_left.
     @Override
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        // Wir wollen, dass die Block-Richtung entgegen der horizontalen Spieler-Guck-Richtung ist.
+        // We want the block(s) facing in the opposite direction of the players facing direction.
         return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
     }
 
-    // Vielleicht überflüssig, da onBlockPlaced die Methode nicht aufruft, sondern gleich den Multiblock baut.
+    /** This is used together with getMetaFromState when saving the world / reloading the data from a saved world into BlockStates. (the direction is set in getActualState dynamically) */
     @Override
     public IBlockState getStateFromMeta(int meta)
     {
-        // return this.getDefaultState();
-        if (meta == 0) {
-            return this.getDefaultState().withProperty(FACING, EnumFacing.SOUTH);
-        } else if (meta == 1) {
-            return this.getDefaultState().withProperty(PART, EnumArcTablePart.TABLE_RIGHT).withProperty(FACING, EnumFacing.SOUTH);
-        } else if (meta == 2) {
-            return this.getDefaultState().withProperty(PART, EnumArcTablePart.PINBOARD_LEFT).withProperty(FACING, EnumFacing.SOUTH);
-        } else if (meta == 3) {
-            return this.getDefaultState().withProperty(PART, EnumArcTablePart.PINBOARD_RIGHT).withProperty(FACING, EnumFacing.SOUTH);
-        } else throw new IllegalArgumentException("The ArchitectTable meta: " + meta + " has none of the four EnumArcTablePart values.");
-    }
-
-    // Was wollen wir hier? Man soll im Spiel ja eigentlich nur den LEFT_TABLE handeln. Alle anderen sollen nicht als Item vorliegen. Aber schon als Block.
-    // Wir testen mal für Tisch-Teil einen anderen Meta-Value.
-    /**Convert the BlockState into the correct metadata value*/
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        if(state.getValue(PART) == EnumArcTablePart.TABLE_LEFT) {
-            return 0;
-        } else if (state.getValue(PART) == EnumArcTablePart.TABLE_RIGHT) {
-            return 1;
-        } else if (state.getValue(PART) == EnumArcTablePart.PINBOARD_LEFT) {
-            return 2;
-        } else if (state.getValue(PART) == EnumArcTablePart.PINBOARD_RIGHT) {
-            return 3;
-        } else {
-            throw new IllegalArgumentException("The ArchitectTable state: " + state + " has none of the four EnumArcTablePart values.");
+        switch (meta) {
+            case 0:
+                return this.getDefaultState();
+            case 1:
+                return this.getDefaultState().withProperty(PART, EnumArcTablePart.TABLE_RIGHT);
+            case 2:
+                return this.getDefaultState().withProperty(PART, EnumArcTablePart.PINBOARD_LEFT);
+            case 3:
+                return this.getDefaultState().withProperty(PART, EnumArcTablePart.PINBOARD_RIGHT);
+            default: return this.getDefaultState();
         }
     }
+
+    /**Convert the BlockState into the correct metadata value*/
+    @Override
+    public int getMetaFromState(IBlockState state) { return state.getValue(PART).getMetadata(); }
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
-         // So wird in BlockBed nach der State gecheckt:
-         // state.getValue(PART) == BlockBed.EnumPartType.FOOT
-         // Ersetze ich mal mit dem Vorigen MetaDatenVergleich:
-         // int metaFromState = state.getBlock().damageDropped(state);
-         // Block.dropBlockAsItem
-
-         if (state.getValue(PART) == EnumArcTablePart.TABLE_LEFT) {
-             return Item.getItemFromBlock(Blocks.PLANKS);
-         } else if (state.getValue(PART) == EnumArcTablePart.TABLE_RIGHT) {
-             return Item.getItemFromBlock(Blocks.CHEST);
-         } else if (state.getValue(PART) == EnumArcTablePart.PINBOARD_LEFT || state.getValue(PART) == EnumArcTablePart.PINBOARD_RIGHT) {
-             return Items.SIGN;
-         } else {
-             return null;
-         }
+        switch (state.getValue(PART)) {
+            case TABLE_LEFT:
+                return Item.getItemFromBlock(Blocks.PLANKS);
+            case TABLE_RIGHT:
+                return Item.getItemFromBlock(Blocks.CHEST);
+            case PINBOARD_LEFT:
+                return Items.SIGN;
+            case PINBOARD_RIGHT:
+                return Items.SIGN;
+            default: return null;
+        }
     }
 
-     // Muss definiert sein, da der Block in den Welt-Daten nur mit 16 bit Informationen abgespeichert wird.
-     // D. h. nach jedem Neustart würde der Multiblock in Richtung Süden schauen.
-     @Override
-     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-     {
-         int partMeta = this.getMetaFromState(state);
 
-         if (partMeta == 0) {
-             // partMeta 0 means this is table_left.
-             // Vorher hatte ich worldIn.getBlockState(pos.DIRECT()) == ModBlocks.ARCHITECT_TABLE <- Warum immer false?
-             // worldIn.getBlockState(pos.DIRECT()) instanceof BlockArchitectTable <- Ist auch immer false. Warum?
-             if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
-             } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
-             } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
-             } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
-             } else {
-                 // Should not be possible.
-                 return this.getDefaultState();
-         }
-         } else if (partMeta == 1) {
-             // partMeta 1 means this is table_right.
-             if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
-             } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
-             } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
-             } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
-             } else {
-                 // Should not be possible.
-                 return this.getStateFromMeta(partMeta);
-             }
-         } else if (partMeta == 2) {
-             // partMeta 2 means this is pinboard_left.
-             if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
-             } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
-             } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
-             } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
-             } else {
-                 // Should not be possible.
-                 return this.getStateFromMeta(partMeta);
-             }
-         } else if (partMeta == 3) {
-             // partMeta 3 means this is pinboard_right.
-             if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
-             } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
-             } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
-             } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
-                 return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
-             } else {
-                 // Should not be possible.
-                 return this.getStateFromMeta(partMeta);
-             }
-         } else {
-             // Should not be possible.
-             return this.getDefaultState();
-         }
-     }
+    // TODO: AB HIER WEITER! Aufräumen...
+    /** Must be defined because only the PART of the blocks are saved in the world data (in form of the meta value 0/1/2/3).
+    /* Without it the blocks would always face south. */
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
+    {
+        int partMeta = this.getMetaFromState(state);
 
-     @Override
-     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-     {
-         // TODO: Hier die TileEntity für die Truhe zerstören, sobald diese implementiert ist.
-         /*
-         if (hasTileEntity(state) && !(this instanceof BlockContainer))
-         {
-             worldIn.removeTileEntity(pos);
-         }
-         */
+        if (partMeta == 0) {
+            // partMeta 0 means this is table_left.
+            // Die Richtung, in der der table_right davon liegt, bestimmt die Richtung des MultiBlocks.
+            if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
+            } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
+            } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
+            } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
+               return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
+            } else {
+                // Should not be possible.
+                return this.getDefaultState();
+        }
+        } else if (partMeta == 1) {
+            // partMeta 1 means this is table_right.
+            if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
+            } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
+            } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
+            } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
+            } else {
+                // Should not be possible.
+                return this.getStateFromMeta(partMeta);
+            }
+        } else if (partMeta == 2) {
+            // partMeta 2 means this is pinboard_left.
+            if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
+            } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
+            } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
+            } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
+            } else {
+                // Should not be possible.
+                return this.getStateFromMeta(partMeta);
+            }
+        } else if (partMeta == 3) {
+            // partMeta 3 means this is pinboard_right.
+            if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.WEST);
+            } else if (worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.NORTH);
+            } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.EAST);
+            } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
+                return this.getStateFromMeta(partMeta).withProperty(FACING, EnumFacing.SOUTH);
+            } else {
+                // Should not be possible.
+                return this.getStateFromMeta(partMeta);
+            }
+        } else {
+            // Should not be possible.
+            return this.getDefaultState();
+        }
+    }
 
-         int partMeta = state.getValue(PART).getMetadata();
-         // S-W-N-E ist 0-1-2-3
-         int facingIndex = state.getValue(FACING).getHorizontalIndex();
-         int yOffset = 1;
-         int sideOffset = 1;
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
+    {
+        // TODO: Hier die TileEntity für die Truhe zerstören, sobald diese implementiert ist.
+        /*
+        if (hasTileEntity(state) && !(this instanceof BlockContainer))
+        {
+            worldIn.removeTileEntity(pos);
+        }
+        */
+
+        // We need to getActualState so the facing fits the actual multiBlockFacing.
+        state = this.getActualState(state, worldIn, pos);
+        int partMeta = state.getValue(PART).getMetadata();
+        // S-W-N-E ist 0-1-2-3
+        int facingIndex = state.getValue(FACING).getHorizontalIndex();
+        int yOffset = 1;
+        int sideOffset = 1;
 
 
-         // Part und Facing bestimmt wie zerstört wird.
-         // Für oben muss unten zerstört werden (& vice versa) // Für links muss rechts zerstört werden (& vice versa).
-         //
-         //     #---#---#
-         //     | 2 | 3 |
-         //     #---#---#   Für yOffset = 1 und sideOffset = 1 werden {1,2,3} zerstört.
-         //     | 0 | 1 |
-         //     #---#---#
-         //
-         // x- und y-Offset verschiebt und/oder spiegelt die 3 Zerstör-Positionen
-         if (partMeta == 0) {
-             yOffset = 1;
-             sideOffset = 1;
-             // Vielleicht falsch, da destroyBlock wohl dropBlockAsItem macht.
-             // worldIn.destroyBlock(pos.east(),true);
-             // worldIn.destroyBlock(pos.up(), true);
-         } else if (partMeta == 1) {
-             yOffset = 1;
-             sideOffset = -1;
-         } else if (partMeta == 2) {
-             yOffset = -1;
-             sideOffset = 1;
-         } else if (partMeta == 3) {
-             yOffset = -1;
-             sideOffset = -1;
-         }
-
+        // Part und Facing bestimmt wie zerstört wird.
+        // Für oben muss unten zerstört werden (& vice versa) // Für links muss rechts zerstört werden (& vice versa).
+        //
+        //     #---#---#
+        //     | 2 | 3 |
+        //     #---#---#   Für yOffset = 1 und sideOffset = 1 werden {1,2,3} zerstört.
+        //     | 0 | 1 |
+        //     #---#---#
+        //
+        // x- und y-Offset verschiebt und/oder spiegelt die 3 Zerstör-Positionen
+        if (partMeta == 0) {
+            yOffset = 1;
+            sideOffset = 1;
+            // Vielleicht falsch, da destroyBlock wohl dropBlockAsItem macht.
+            // worldIn.destroyBlock(pos.east(),true);
+            // worldIn.destroyBlock(pos.up(), true);
+        } else if (partMeta == 1) {
+            yOffset = 1;
+            sideOffset = -1;
+        } else if (partMeta == 2) {
+            yOffset = -1;
+            sideOffset = 1;
+        } else if (partMeta == 3) {
+            yOffset = -1;
+            sideOffset = -1;
+        }
          if (facingIndex == 0) {
-             // Facing South
-             worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
-             worldIn.destroyBlock(pos.add(sideOffset, 0, 0), true);
-             worldIn.destroyBlock(pos.add(sideOffset, yOffset, 0), true);
-         } else if (facingIndex == 1) {
-             worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
-             worldIn.destroyBlock(pos.add(0, 0, sideOffset), true);
-             worldIn.destroyBlock(pos.add(0, yOffset, sideOffset), true);
-         } else if (facingIndex == 2) {
-             worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
-             worldIn.destroyBlock(pos.add(-sideOffset, 0, 0), true);
-             worldIn.destroyBlock(pos.add(-sideOffset, yOffset, 0), true);
-         } else if (facingIndex == 3) {
-             worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
-             worldIn.destroyBlock(pos.add(0, 0, -sideOffset), true);
-             worldIn.destroyBlock(pos.add(0, yOffset, -sideOffset), true);
-         }
-     }
+            // Facing South
+            worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
+            worldIn.destroyBlock(pos.add(sideOffset, 0, 0), true);
+            worldIn.destroyBlock(pos.add(sideOffset, yOffset, 0), true);
+        } else if (facingIndex == 1) {
+            worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
+            worldIn.destroyBlock(pos.add(0, 0, sideOffset), true);
+            worldIn.destroyBlock(pos.add(0, yOffset, sideOffset), true);
+        } else if (facingIndex == 2) {
+            worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
+            worldIn.destroyBlock(pos.add(-sideOffset, 0, 0), true);
+            worldIn.destroyBlock(pos.add(-sideOffset, yOffset, 0), true);
+        } else if (facingIndex == 3) {
+            worldIn.destroyBlock(pos.add(0, yOffset, 0), true);
+            worldIn.destroyBlock(pos.add(0, 0, -sideOffset), true);
+            worldIn.destroyBlock(pos.add(0, yOffset, -sideOffset), true);
+        }
+    }
 
     public enum EnumArcTablePart implements IStringSerializable {
         TABLE_LEFT("table_left", 0),
