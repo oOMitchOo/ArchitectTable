@@ -213,22 +213,28 @@ public class BlockArchitectTable extends BlockBase {
             case TABLE_RIGHT:
                 return Item.getItemFromBlock(Blocks.CHEST);
             case PINBOARD_LEFT:
-                return Items.SIGN;
+                return Items.ITEM_FRAME;
             case PINBOARD_RIGHT:
-                return Items.SIGN;
+                return Items.ITEM_FRAME;
             default: return null;
         }
     }
 
+    private EnumFacing getDirectionOfVerticalNeighborArchTableBlock(IBlockAccess worldIn, BlockPos pos) {
+        if (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockArchitectTable) {
+            return EnumFacing.UP;
+        } else return EnumFacing.DOWN; // This is also returned if the architectTableBlock has no neighbor in U-D (which means it was just destroyed).
+    }
+
     /** Helping method for finding out in which direction the next architectTableBlock lies. */
-    private EnumFacing getDirectionOfNeighborArchTableBlock(IBlockAccess worldIn, BlockPos pos) {
+    private EnumFacing getDirectionOfHorizontalNeighborArchTableBlock(IBlockAccess worldIn, BlockPos pos) {
         if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockArchitectTable) {
             return EnumFacing.NORTH;
         } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable) {
             return EnumFacing.SOUTH;
         } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockArchitectTable) {
             return EnumFacing.WEST;
-        } else return EnumFacing.EAST; // Every ArchTableBlock must have a neighboring ArchTableBlock. Last possibility is east.
+        } else return EnumFacing.EAST; // This is also returned if the architectTableBlock has no neighbor in N-E-S-W (which means it was just destroyed).
     }
 
     /** Must be defined because only the PART of the blocks are saved in the world data (in form of the meta value 0/1/2/3).
@@ -237,7 +243,7 @@ public class BlockArchitectTable extends BlockBase {
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
         int partMeta = this.getMetaFromState(state);
-        EnumFacing directionNextArchTable = getDirectionOfNeighborArchTableBlock(worldIn, pos);
+        EnumFacing directionNextArchTable = getDirectionOfHorizontalNeighborArchTableBlock(worldIn, pos);
         // This is returning the multiBlockFacing for every part of the architect table. Example (bird's eye view):
         //  #----#----#----#----#
         //  |    |    |    |    |        N
@@ -261,87 +267,115 @@ public class BlockArchitectTable extends BlockBase {
         }
     }
 
+    /** I've put in some effort so that this method only gets executed if a full multiBlock is present. (else non-multiBlock-blocks could get destroyed in the process) */ // TODO: Needs some tidy up.
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        // TODO: Hier die TileEntity für die Truhe zerstören, sobald diese implementiert ist.
-        /*
-        if (hasTileEntity(state) && !(this instanceof BlockContainer))
-        {
-            worldIn.removeTileEntity(pos);
-        }
-        */
+        EnumFacing horizontalNeighbor = getDirectionOfHorizontalNeighborArchTableBlock(worldIn, pos); // N-E-S-W - or when his horizontal neighbor was just broken U.
+        EnumFacing verticalNeighbor = getDirectionOfVerticalNeighborArchTableBlock(worldIn, pos); // U-D - or when his vertical neighbor was just broken S.
+        if (!worldIn.isRemote && (horizontalNeighbor != EnumFacing.EAST || worldIn.getBlockState(pos.east()).getBlock() instanceof BlockArchitectTable)
+                && (verticalNeighbor != EnumFacing.SOUTH || worldIn.getBlockState(pos.south()).getBlock() instanceof BlockArchitectTable)) {
 
-        // We need to getActualState so the facing fits the actual multiBlockFacing.
-        state = this.getActualState(state, worldIn, pos);
-        int partMeta = state.getValue(PART).getMetadata();
-        int yOffset = 0;
-        int sideOffset = 0;
-        boolean dropItems = true;
+            BlockPos lastBlockToCheck = pos; // This will be the third and last block to check before we know that the multiblock is intact (before destroying it).
+            switch (horizontalNeighbor) {
+                case NORTH:
+                    if (verticalNeighbor == EnumFacing.UP) lastBlockToCheck = lastBlockToCheck.north().up();
+                    else lastBlockToCheck = lastBlockToCheck.north().down();
+                    break;
+                case SOUTH:
+                    if (verticalNeighbor == EnumFacing.UP) lastBlockToCheck = lastBlockToCheck.south().up();
+                    else lastBlockToCheck = lastBlockToCheck.south().down();
+                    break;
+                case WEST:
+                    if (verticalNeighbor == EnumFacing.UP) lastBlockToCheck = lastBlockToCheck.west().up();
+                    else lastBlockToCheck = lastBlockToCheck.west().down();
+                    break;
+                case EAST:
+                    if (verticalNeighbor == EnumFacing.UP) lastBlockToCheck = lastBlockToCheck.east().up();
+                    else lastBlockToCheck = lastBlockToCheck.east().down();
+                    break;
+            }
 
-        // Part und Facing bestimmt wie zerstört wird.
-        // Für oben muss unten zerstört werden (& vice versa) // Für links muss rechts zerstört werden (& vice versa).
-        //
-        //     #---#---#
-        //     | 2 | 3 |    If 0 is the position of pos, yOffset = 1 and sideOffset = 1,
-        //     #---#---#    then the blocks on position 1,2,3 will be destroyed.
-        //     | 0 | 1 |
-        //     #---#---#
-        //
-        // yOffset and sideOffset moves which three blocks around pos get destroyed.
+            if (worldIn.getBlockState(lastBlockToCheck).getBlock() instanceof BlockArchitectTable) {
 
-        switch (partMeta) {
-            case 0: // table_left
-                yOffset = 1;
-                sideOffset = 1;
-                break;
-            case 1: // table_right
-                yOffset = 1;
-                sideOffset = -1;
-                break;
-            case 2: // pinboard_left
-                yOffset = -1;
-                sideOffset = 1;
-                break;
-            case 3: // pinboard_right
-                yOffset = -1;
-                sideOffset = -1;
-                break;
-        }
+                // TODO: Here the TileEntity(s) of the multiBlock must be destroyed when they have been implemented.
+                /*
+                if (hasTileEntity(state) && !(this instanceof BlockContainer))
+                {
+                    worldIn.removeTileEntity(pos);
+                }
+                */
 
-        // Don't get any dropped Items, if the destroyingPlayer (more accurate: the player closest by) is in creative. WARNING: Could be buggy with more than one player nearby both in different playing modes.
-        EntityPlayer destroyingPlayer = worldIn.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 7.0D, false); // false looks for not-spectators.
-        if (destroyingPlayer != null) if(destroyingPlayer.isCreative()) dropItems = false;
+                // We need to getActualState so the facing fits the actual multiBlockFacing.
+                state = this.getActualState(state, worldIn, pos);
+                int partMeta = state.getValue(PART).getMetadata();
+                int yOffset = 0;
+                int sideOffset = 0;
+                boolean dropItems = true;
 
-        // TODO: This could use some tidy up.
-        switch (state.getValue(FACING)) { // multiBlockFacing
-            case DOWN: // Should not be possible.
-                break;
-            case UP: // Should not be possible.
-                break;
-            case NORTH:
-                worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
-                worldIn.destroyBlock(pos.add(-sideOffset, 0, 0), dropItems);
-                worldIn.destroyBlock(pos.add(-sideOffset, yOffset, 0), dropItems);
-                break;
-            case SOUTH:
-                worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
-                worldIn.destroyBlock(pos.add(sideOffset, 0, 0), dropItems);
-                worldIn.destroyBlock(pos.add(sideOffset, yOffset, 0), dropItems);
-                break;
-            case WEST:
-                worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
-                worldIn.destroyBlock(pos.add(0, 0, sideOffset), dropItems);
-                worldIn.destroyBlock(pos.add(0, yOffset, sideOffset), dropItems);
-                break;
-            case EAST:
-                worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
-                worldIn.destroyBlock(pos.add(0, 0, -sideOffset), dropItems);
-                worldIn.destroyBlock(pos.add(0, yOffset, -sideOffset), dropItems);
-                break;
+                // PART and FACING determines which other blocks must be destroyed.
+                //
+                //     #---#---#
+                //     | 2 | 3 |    If 0 is the position of pos, yOffset = 1 and sideOffset = 1,
+                //     #---#---#    then the blocks on position 1,2,3 will be destroyed.
+                //     | 0 | 1 |
+                //     #---#---#
+                //
+                // yOffset and sideOffset moves which three blocks around pos get destroyed.
+
+                switch (partMeta) {
+                    case 0: // table_left
+                        yOffset = 1;
+                        sideOffset = 1;
+                        break;
+                    case 1: // table_right
+                        yOffset = 1;
+                        sideOffset = -1;
+                        break;
+                    case 2: // pinboard_left
+                        yOffset = -1;
+                        sideOffset = 1;
+                        break;
+                    case 3: // pinboard_right
+                        yOffset = -1;
+                        sideOffset = -1;
+                        break;
+                }
+
+                // Don't get any dropped Items, if the destroyingPlayer (more accurate: the player closest by) is in creative. WARNING: Could be buggy with more than one player nearby both in different playing modes.
+                EntityPlayer destroyingPlayer = worldIn.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 7.0D, false); // false looks for not-spectators.
+                if (destroyingPlayer != null) if (destroyingPlayer.isCreative()) dropItems = false;
+
+                // TODO: This could use some tidy up.
+                switch (state.getValue(FACING)) { // multiBlockFacing
+                    case NORTH:
+                        worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
+                        worldIn.destroyBlock(pos.add(-sideOffset, 0, 0), dropItems);
+                        worldIn.destroyBlock(pos.add(-sideOffset, yOffset, 0), dropItems);
+                        break;
+                    case SOUTH:
+                        worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
+                        worldIn.destroyBlock(pos.add(sideOffset, 0, 0), dropItems);
+                        worldIn.destroyBlock(pos.add(sideOffset, yOffset, 0), dropItems);
+                        break;
+                    case WEST:
+                        worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
+                        worldIn.destroyBlock(pos.add(0, 0, sideOffset), dropItems);
+                        worldIn.destroyBlock(pos.add(0, yOffset, sideOffset), dropItems);
+                        break;
+                    case EAST:
+                        worldIn.destroyBlock(pos.add(0, yOffset, 0), dropItems);
+                        worldIn.destroyBlock(pos.add(0, 0, -sideOffset), dropItems);
+                        worldIn.destroyBlock(pos.add(0, yOffset, -sideOffset), dropItems);
+                        break;
+                    default:
+                        break; // Should not be possible. (Up or Down)
+                }
+            }
         }
     }
 
+    /** Enum for the four parts of the architect table multiBlock */
     public enum EnumArcTablePart implements IStringSerializable {
         TABLE_LEFT("table_left", 0),
         TABLE_RIGHT("table_right", 1),

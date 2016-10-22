@@ -4,8 +4,7 @@
   {
     "textures":
     {
-      "particle": "minecraft:blocks/hardened_clay_stained_cyan",
-      "all": "minecraft:blocks/hardened_clay_stained_white"
+      "particle": "minecraft:blocks/planks_oak"
     },
     "model": "block/block"
   }, "variants":
