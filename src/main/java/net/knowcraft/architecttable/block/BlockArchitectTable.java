@@ -1,7 +1,5 @@
 package net.knowcraft.architecttable.block;
 
-import net.knowcraft.architecttable.init.ModBlocks;
-import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -14,11 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -28,7 +22,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
@@ -138,10 +131,6 @@ public class BlockArchitectTable extends BlockBase {
         switch (this.getMetaFromState(state)) {
             case 2: // pinboard_left - the selectingBB goes over both halfs of the pinboard. (no more dividing the pinboard when looking at it)
                 switch (state.getValue(FACING)) {
-                    case DOWN: // Should not be possible.
-                        break;
-                    case UP: // Should not be possible.
-                        break;
                     case NORTH:
                         return PINBOARD_SELECTING_BB[0].offset(pos.west());
                     case SOUTH:
@@ -150,13 +139,10 @@ public class BlockArchitectTable extends BlockBase {
                         return PINBOARD_SELECTING_BB[2].offset(pos);
                     case EAST:
                         return PINBOARD_SELECTING_BB[3].offset(pos.north());
+                    default: break; // Should not be possible. (Up or Down)
                 }
             case 3: // pinboard_right - the selectingBB goes over both halfs of the pinboard. (no more dividing the pinboard when looking at it)
                 switch (state.getValue(FACING)) {
-                    case DOWN: // Should not be possible.
-                        break;
-                    case UP: // Should not be possible.
-                        break;
                     case NORTH:
                         return PINBOARD_SELECTING_BB[0].offset(pos);
                     case SOUTH:
@@ -165,6 +151,7 @@ public class BlockArchitectTable extends BlockBase {
                         return PINBOARD_SELECTING_BB[2].offset(pos.north());
                     case EAST:
                         return PINBOARD_SELECTING_BB[3].offset(pos);
+                    default: break; // Should not be possible. (Up or Down)
                 }
             default: return TABLE_SELECTING_BB.offset(pos); // table_left (meta 0) and table_right (meta 1) - smaller selectingBox (in y) than collidingBox.
         }

@@ -1,5 +1,6 @@
 package net.knowcraft.architecttable.client;
 
+import net.knowcraft.architecttable.init.ModItems;
 import net.knowcraft.architecttable.reference.Reference;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
@@ -17,7 +18,7 @@ public class ModCreativeTab extends CreativeTabs{
     @Override
     public Item getTabIconItem() {
         // TODO: Mod-Item als Tab-Icon setzen.
-        return Items.BRICK;
+        return ModItems.DRAWING_TOOLS;
     }
 
     @Override

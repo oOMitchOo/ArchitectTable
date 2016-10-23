@@ -1,0 +1,8 @@
+# Creative Tab
+itemGroup.architecttable=Architect Table
+
+# Items
+item.drawingTools.name=Zeichenwerkzeug
+
+# Blocks
+tile.architectTable.name=Architektentisch
