@@ -1,0 +1,20 @@
+{
+  "forge_marker": 1,
+  "defaults":
+  {
+    "textures":
+    {
+      "particle": "minecraft:blocks/planks_birch"
+    },
+    "model": "block/block"
+  }, "variants":
+{
+  "inventory": { "model": "block/block" },
+  "facing=south": {"model": "architecttable:AAA_pinboard_right"},
+  "facing=west": {"model": "architecttable:AAA_pinboard_right", "y": 90},
+  "facing=north": {"model": "architecttable:AAA_pinboard_right", "y": 180},
+  "facing=east": {"model": "architecttable:AAA_pinboard_right", "y": 270},
+  "facing=up": {"model": "architecttable:AAA_pinboard_right"}, // Just for error prevention. Block should never be oriented this way.
+  "facing=down": {"model": "architecttable:AAA_pinboard_right"} // See first comment.
+}
+}

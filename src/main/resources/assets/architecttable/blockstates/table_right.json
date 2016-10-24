@@ -1,0 +1,51 @@
+{
+  "forge_marker": 1,
+  "defaults":
+  {
+    "model": "block/block"
+  }, "variants":
+{
+  "inventory": { "model": "block/block" },
+  "facing=south,variant=oak": {"model": "architecttable:table_right_oak"},
+  "facing=west,variant=oak": {"model": "architecttable:table_right_oak", "y": 90},
+  "facing=north,variant=oak": {"model": "architecttable:table_right_oak", "y": 180},
+  "facing=east,variant=oak": {"model": "architecttable:table_right_oak", "y": 270},
+  "facing=up,variant=oak": {"model": "architecttable:table_right_oak"}, // Just for error prevention. Block should never be oriented this way.
+  "facing=down,variant=oak": {"model": "architecttable:table_right_oak"}, // See first comment.
+
+  "facing=south,variant=spruce": {"model": "architecttable:table_right_spruce"},
+  "facing=west,variant=spruce": {"model": "architecttable:table_right_spruce", "y": 90},
+  "facing=north,variant=spruce": {"model": "architecttable:table_right_spruce", "y": 180},
+  "facing=east,variant=spruce": {"model": "architecttable:table_right_spruce", "y": 270},
+  "facing=up,variant=spruce": {"model": "architecttable:table_right_spruce"}, // See first comment.
+  "facing=down,variant=spruce": {"model": "architecttable:table_right_spruce"}, // See first comment.
+
+  "facing=south,variant=birch": {"model": "architecttable:table_right_birch"},
+  "facing=west,variant=birch": {"model": "architecttable:table_right_birch", "y": 90},
+  "facing=north,variant=birch": {"model": "architecttable:table_right_birch", "y": 180},
+  "facing=east,variant=birch": {"model": "architecttable:table_right_birch", "y": 270},
+  "facing=up,variant=birch": {"model": "architecttable:table_right_birch"}, // See first comment.
+  "facing=down,variant=birch": {"model": "architecttable:table_right_birch"}, // See first comment.
+
+  "facing=south,variant=jungle": {"model": "architecttable:table_right_jungle"},
+  "facing=west,variant=jungle": {"model": "architecttable:table_right_jungle", "y": 90},
+  "facing=north,variant=jungle": {"model": "architecttable:table_right_jungle", "y": 180},
+  "facing=east,variant=jungle": {"model": "architecttable:table_right_jungle", "y": 270},
+  "facing=up,variant=jungle": {"model": "architecttable:table_right_jungle"}, // See first comment.
+  "facing=down,variant=jungle": {"model": "architecttable:table_right_jungle"}, // See first comment.
+
+  "facing=south,variant=acacia": {"model": "architecttable:table_right_acacia"},
+  "facing=west,variant=acacia": {"model": "architecttable:table_right_acacia", "y": 90},
+  "facing=north,variant=acacia": {"model": "architecttable:table_right_acacia", "y": 180},
+  "facing=east,variant=acacia": {"model": "architecttable:table_right_acacia", "y": 270},
+  "facing=up,variant=acacia": {"model": "architecttable:table_right_acacia"}, // See first comment.
+  "facing=down,variant=acacia": {"model": "architecttable:table_right_acacia"}, // See first comment.
+
+  "facing=south,variant=dark_oak": {"model": "architecttable:table_right_dark_oak"},
+  "facing=west,variant=dark_oak": {"model": "architecttable:table_right_dark_oak", "y": 90},
+  "facing=north,variant=dark_oak": {"model": "architecttable:table_right_dark_oak", "y": 180},
+  "facing=east,variant=dark_oak": {"model": "architecttable:table_right_dark_oak", "y": 270},
+  "facing=up,variant=dark_oak": {"model": "architecttable:table_right_dark_oak"}, // See first comment.
+  "facing=down,variant=dark_oak": {"model": "architecttable:table_right_dark_oak"} // See first comment.
+}
+}

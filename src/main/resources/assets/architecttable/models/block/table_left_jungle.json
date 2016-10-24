@@ -1,0 +1,7 @@
+{
+  "parent": "architecttable:block/AAA_table_left",
+  "textures": {
+    "planks": "blocks/planks_jungle",
+    "wood": "blocks/log_jungle"
+  }
+}

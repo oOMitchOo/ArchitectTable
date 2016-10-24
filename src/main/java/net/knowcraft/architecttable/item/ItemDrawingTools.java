@@ -215,7 +215,7 @@ public class ItemDrawingTools extends ItemBase{
         List<EntityItemFrame> itemFramesOverPlanksBlock = worldIn.getEntitiesWithinAABB(EntityItemFrame.class, Block.FULL_BLOCK_AABB.offset(planksPos.add(0, 1, 0)));
         for (EntityItemFrame entry : itemFramesOverPlanksBlock) {
             if(!worldIn.isRemote && entry != null && entry.facingDirection == multiBlockFacing) { entry.dropItemOrSelf(playerIn, false); entry.setDead(); break; }
-            if(worldIn.isRemote && entry != null && entry.facingDirection == multiBlockFacing) { entry.setDropItemsWhenDead(false); entry.setDead(); break; } // TODO: nullability untersuchen.
+            if(worldIn.isRemote && entry != null && entry.facingDirection == multiBlockFacing) { entry.setDropItemsWhenDead(false); entry.setDead(); break; }
         }
 
         switch (multiBlockFacing) {

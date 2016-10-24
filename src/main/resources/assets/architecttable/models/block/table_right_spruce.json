@@ -1,0 +1,7 @@
+{
+  "parent": "architecttable:block/AAA_table_right",
+  "textures": {
+    "planks": "blocks/planks_spruce",
+    "wood": "blocks/log_spruce"
+  }
+}
