@@ -61,7 +61,7 @@ public class BlockTableRight extends BlockArchitectTableNEW {
      * They must all be offset by the BlockPos of the block which is been looked at. (rendering stuff) */
     @Override
     @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) { return TABLE_SELECTING_BB; }
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) { return TABLE_SELECTING_BB.offset(pos); }
 
     /** I've put in some effort so that this method only gets executed if a full multiBlock is present. (else non-multiBlock-blocks could get destroyed in the process) */
     @Override

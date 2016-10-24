@@ -206,7 +206,7 @@ public class ItemDrawingTools extends ItemBase{
 
         // Replacing planksBlock with BlockTableLeft.
         worldIn.setBlockState(planksPos, ModBlocks.TABLE_LEFT.getStateFromMeta(planksMeta).withProperty(BlockArchitectTableNEW.FACING, multiBlockFacing));
-        worldIn.playEvent(2001, planksPos, BlockTableLeft.getStateId(ModBlocks.TABLE_LEFT.getDefaultState())); // StateId is only used for crashs... and uses the Blocks ID (?).
+        worldIn.playEvent(2001, planksPos, BlockTableLeft.getStateId(ModBlocks.TABLE_LEFT.getStateFromMeta(planksMeta))); // StateId is only used for crashs... and uses the Blocks ID (?).
         // Killing itemFrameOverPlanks and placing BlockPinboardLeft.
         if(!worldIn.isRemote && itemFrameOverPlanks != null) { itemFrameOverPlanks.dropItemOrSelf(playerIn, false); itemFrameOverPlanks.setDead(); }
         if(worldIn.isRemote && itemFrameOverPlanks != null) { itemFrameOverPlanks.setDropItemsWhenDead(false); itemFrameOverPlanks.setDead(); }
@@ -218,7 +218,7 @@ public class ItemDrawingTools extends ItemBase{
             case NORTH:
                 // Replacing chestBlock with BlockTableRight.
                 worldIn.setBlockState(planksPos.west(), ModBlocks.TABLE_RIGHT.getStateFromMeta(planksMeta).withProperty(BlockArchitectTableNEW.FACING, multiBlockFacing));
-                worldIn.playEvent(2001, planksPos.west(), BlockTableRight.getStateId(ModBlocks.TABLE_RIGHT.getDefaultState()));
+                worldIn.playEvent(2001, planksPos.west(), BlockTableRight.getStateId(ModBlocks.TABLE_RIGHT.getStateFromMeta(planksMeta)));
                 // Killing itemFrameOverChest and placing BlockPinboardRight.
                 if(!worldIn.isRemote && itemFrameOverChest != null) { itemFrameOverChest.dropItemOrSelf(playerIn, false); itemFrameOverChest.setDead(); }
                 if(worldIn.isRemote && itemFrameOverChest != null) { itemFrameOverChest.setDropItemsWhenDead(false); itemFrameOverChest.setDead(); }
@@ -228,7 +228,7 @@ public class ItemDrawingTools extends ItemBase{
             case SOUTH:
                 // Replacing chestBlock with BlockTableRight.
                 worldIn.setBlockState(planksPos.east(), ModBlocks.TABLE_RIGHT.getStateFromMeta(planksMeta).withProperty(BlockArchitectTableNEW.FACING, multiBlockFacing));
-                worldIn.playEvent(2001, planksPos.east(), BlockTableRight.getStateId(ModBlocks.TABLE_RIGHT.getDefaultState()));
+                worldIn.playEvent(2001, planksPos.east(), BlockTableRight.getStateId(ModBlocks.TABLE_RIGHT.getStateFromMeta(planksMeta)));
                 // Killing itemFrameOverChest and placing BlockPinboardRight.
                 if(!worldIn.isRemote && itemFrameOverChest != null) { itemFrameOverChest.dropItemOrSelf(playerIn, false); itemFrameOverChest.setDead(); }
                 if(worldIn.isRemote && itemFrameOverChest != null) { itemFrameOverChest.setDropItemsWhenDead(false); itemFrameOverChest.setDead(); }
@@ -238,7 +238,7 @@ public class ItemDrawingTools extends ItemBase{
             case WEST:
                 // Replacing chestBlock with BlockTableRight.
                 worldIn.setBlockState(planksPos.south(), ModBlocks.TABLE_RIGHT.getStateFromMeta(planksMeta).withProperty(BlockArchitectTableNEW.FACING, multiBlockFacing));
-                worldIn.playEvent(2001, planksPos.south(), BlockTableRight.getStateId(ModBlocks.TABLE_RIGHT.getDefaultState()));
+                worldIn.playEvent(2001, planksPos.south(), BlockTableRight.getStateId(ModBlocks.TABLE_RIGHT.getStateFromMeta(planksMeta)));
                 // Killing itemFrameOverChest and placing BlockPinboardRight.
                 if(!worldIn.isRemote && itemFrameOverChest != null) { itemFrameOverChest.dropItemOrSelf(playerIn, false); itemFrameOverChest.setDead(); }
                 if(worldIn.isRemote && itemFrameOverChest != null) { itemFrameOverChest.setDropItemsWhenDead(false); itemFrameOverChest.setDead(); }
@@ -248,7 +248,7 @@ public class ItemDrawingTools extends ItemBase{
             case EAST:
                 // Replacing chestBlock with BlockTableRight.
                 worldIn.setBlockState(planksPos.north(), ModBlocks.TABLE_RIGHT.getStateFromMeta(planksMeta).withProperty(BlockArchitectTableNEW.FACING, multiBlockFacing));
-                worldIn.playEvent(2001, planksPos.north(), BlockTableRight.getStateId(ModBlocks.TABLE_RIGHT.getDefaultState()));
+                worldIn.playEvent(2001, planksPos.north(), BlockTableRight.getStateId(ModBlocks.TABLE_RIGHT.getStateFromMeta(planksMeta)));
                 // Killing itemFrameOverChest and placing BlockPinboardRight.
                 if(!worldIn.isRemote && itemFrameOverChest != null) { itemFrameOverChest.dropItemOrSelf(playerIn, false); itemFrameOverChest.setDead(); }
                 if(worldIn.isRemote && itemFrameOverChest != null) { itemFrameOverChest.setDropItemsWhenDead(false); itemFrameOverChest.setDead(); }
