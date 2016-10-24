@@ -25,6 +25,7 @@ public class ItemBlockTableLeft extends ItemBlock {
         super(block);
         this.setUnlocalizedName(unlName);
         this.setRegistryName(regName);
+        this.setHasSubtypes(true);
     }
 
     /**
@@ -33,6 +34,12 @@ public class ItemBlockTableLeft extends ItemBlock {
      */
     @Override
     public int getMetadata(int damage) { return damage; }
+
+    /** Returns the unlocalized name of this item. */
+    @Override
+    public String getUnlocalizedName(ItemStack stack) {
+        return this.block.getUnlocalizedName() + "." + BlockPlanks.EnumType.byMetadata(stack.getMetadata()).getName();
+    }
 
     /**
      * Called when a Block is right-clicked with this Item

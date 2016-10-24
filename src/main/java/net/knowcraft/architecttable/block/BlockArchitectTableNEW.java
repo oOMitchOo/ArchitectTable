@@ -1,25 +1,13 @@
 package net.knowcraft.architecttable.block;
 
-import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.List;
 
 /**
  * Created by oOMitchOo on 24.10.2016.
@@ -34,14 +22,8 @@ public class BlockArchitectTableNEW extends BlockBase {
     public BlockArchitectTableNEW(String unlName, String regName) {
         super(Material.WOOD, unlName, regName);
         this.setSoundType(SoundType.WOOD);
-        this.setHardness(2.0F);
         this.setResistance(5.0F);
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
+        this.setHardness(2.0F);
     }
 
     @Override
@@ -57,49 +39,8 @@ public class BlockArchitectTableNEW extends BlockBase {
     }
 
     @Override
-    public int damageDropped(IBlockState state)
+    public boolean isOpaqueCube(IBlockState state)
     {
-        return 0;
+        return false;
     }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) { }
-
-    /** This must be overriden for every block with properties. */
-    @Override
-    protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, new IProperty[] {BlockPlanks.VARIANT, FACING}); }
-
-    /** Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
-     * IBlockstate */
-    @Override
-    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
-    {
-        return this.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.byMetadata(meta)).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
-    }
-
-    /** This is used together with getMetaFromState when saving the world / reloading the data from a saved world into BlockStates. (the direction is set in getActualState dynamically) */
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        switch (meta) {
-            case 0: // Oak
-                return this.getDefaultState();
-            case 1: // Spruce
-                return this.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.SPRUCE);
-            case 2: // Birch
-                return this.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.BIRCH);
-            case 3: // Jungle
-                return this.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.JUNGLE);
-            case 4: // Acacia
-                return this.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.ACACIA);
-            case 5: // Dark Oak
-                return this.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.DARK_OAK);
-            default: return this.getDefaultState();
-        }
-    }
-
-    /** Convert the BlockState into the correct metadata value */
-    @Override
-    public int getMetaFromState(IBlockState state) { return state.getValue(BlockPlanks.VARIANT).getMetadata(); }
 }

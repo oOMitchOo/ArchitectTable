@@ -1,13 +1,10 @@
 package net.knowcraft.architecttable.init;
 
-import net.knowcraft.architecttable.helper.LogHelper;
 import net.knowcraft.architecttable.item.ItemBase;
 import net.knowcraft.architecttable.item.ItemDrawingTools;
-import net.knowcraft.architecttable.reference.Reference;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.RecipesArmor;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -34,8 +31,8 @@ public class ModItems {
     }
 
     public static void registerModels() {
-        // TODO: ModelResourceLocation trouble shooten.
-        // Den komischen substring(indexOf+1) Kram mache ich, um "item." vor dem Namen zu entfernen.
-        ModelLoader.setCustomModelResourceLocation(DRAWING_TOOLS, 0, new ModelResourceLocation(Reference.MOD_ID+":"+DRAWING_TOOLS.getUnlocalizedName().substring(DRAWING_TOOLS.getUnlocalizedName().indexOf(".")+1), "inventory"));
+        // LogHelper.error("Item's unlocalizedName:"+DRAWING_TOOLS.getUnlocalizedName()); returns item.drawingTools
+        // ... getRegistryName() returns architecttable:drawing_tools
+        ModelLoader.setCustomModelResourceLocation(DRAWING_TOOLS, 0, new ModelResourceLocation(DRAWING_TOOLS.getRegistryName(), "inventory"));
     }
 }

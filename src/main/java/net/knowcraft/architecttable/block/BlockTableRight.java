@@ -1,10 +1,15 @@
 package net.knowcraft.architecttable.block;
 
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -13,6 +18,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -25,18 +31,13 @@ public class BlockTableRight extends BlockArchitectTableNEW {
         this.setDefaultState(this.blockState.getBaseState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.OAK).withProperty(FACING, EnumFacing.SOUTH));
     }
 
-    /** The boundingBoxes determine the colliding with the blocks. */
+    /** This is used together with getMetaFromState when saving the world / reloading the data from a saved world into BlockStates. (the direction is set in getActualState dynamically) */
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) { return TABLE_COLLIDING_BB; }
+    public IBlockState getStateFromMeta(int meta) { return this.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.byMetadata(meta)); }
 
-    /** The selectedBoundingBox is the black lines when looking at a block.
-     * They must all be offset by the BlockPos of the block which is been looked at. (rendering stuff) */
+    /** Convert the BlockState into the correct metadata value */
     @Override
-    @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) { return TABLE_SELECTING_BB; }
-
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) { return Item.getItemFromBlock(Blocks.CHEST); }
+    public int getMetaFromState(IBlockState state) { return state.getValue(BlockPlanks.VARIANT).getMetadata(); }
 
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
@@ -51,6 +52,16 @@ public class BlockTableRight extends BlockArchitectTableNEW {
             return state.withProperty(FACING, EnumFacing.SOUTH);
         } else return state.withProperty(FACING, EnumFacing.NORTH);
     }
+
+    /** The boundingBoxes determine the colliding with the blocks. */
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) { return TABLE_COLLIDING_BB; }
+
+    /** The selectedBoundingBox is the black lines when looking at a block.
+     * They must all be offset by the BlockPos of the block which is been looked at. (rendering stuff) */
+    @Override
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) { return TABLE_SELECTING_BB; }
 
     /** I've put in some effort so that this method only gets executed if a full multiBlock is present. (else non-multiBlock-blocks could get destroyed in the process) */
     @Override
@@ -68,7 +79,44 @@ public class BlockTableRight extends BlockArchitectTableNEW {
         }
     }
 
-    /** Helping method */
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) { return Item.getItemFromBlock(Blocks.CHEST); }
+
+    /** Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate */
+    @Override
+    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+    {
+        return this.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.byMetadata(meta)).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) { }
+
+    /** This must be overriden for every block with properties. */
+    @Override
+    protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, new IProperty[] {BlockPlanks.VARIANT, FACING}); }
+
+    /* ======================================== HELPING METHODS =====================================*/
+
+    private boolean isPartOfFullMultiBlock(World worldIn, BlockPos pos, IBlockState state)
+    {
+        EnumFacing blockFacing = this.getActualState(state, worldIn, pos).getValue(FACING);
+
+        switch (blockFacing) {
+            case NORTH: // facing north means BlockTableLeft must be east of it.
+                return (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.east()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.east().up()).getBlock() instanceof BlockPinboardLeft);
+            case SOUTH: // facing south means BlockTableLeft must be west of it.
+                return (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.west()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.west().up()).getBlock() instanceof BlockPinboardLeft);
+            case WEST: // facing west means BlockTableLeft must be north of it.
+                return (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.north()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.north().up()).getBlock() instanceof BlockPinboardLeft);
+            case EAST: // facing east means BlockTableLeft must be south of it.
+                return (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.south()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.south().up()).getBlock() instanceof BlockPinboardLeft);
+            default: return false;
+        }
+    }
+
     private void breakOtherThreeBlocks(World worldIn, BlockPos pos, IBlockState state, boolean dropItems) {
         EnumFacing blockFacing = this.getActualState(state, worldIn, pos).getValue(FACING);
 
@@ -94,24 +142,6 @@ public class BlockTableRight extends BlockArchitectTableNEW {
                 worldIn.destroyBlock(pos.south().up(), dropItems);
                 break;
             default: break;
-        }
-    }
-
-    /** Helping method */
-    private boolean isPartOfFullMultiBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        EnumFacing blockFacing = this.getActualState(state, worldIn, pos).getValue(FACING);
-
-        switch (blockFacing) {
-            case NORTH: // facing north means BlockTableLeft must be east of it.
-                return (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.east()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.east().up()).getBlock() instanceof BlockPinboardLeft);
-            case SOUTH: // facing south means BlockTableLeft must be west of it.
-                return (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.west()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.west().up()).getBlock() instanceof BlockPinboardLeft);
-            case WEST: // facing west means BlockTableLeft must be north of it.
-                return (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.north()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.north().up()).getBlock() instanceof BlockPinboardLeft);
-            case EAST: // facing east means BlockTableLeft must be south of it.
-                return (worldIn.getBlockState(pos.up()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.south()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.south().up()).getBlock() instanceof BlockPinboardLeft);
-            default: return false;
         }
     }
 }

@@ -1,8 +1,13 @@
-# Creative Tab
+### Creative Tab ###
 itemGroup.architecttable=Architect Table
 
-# Items
-item.drawingTools.name=Zeichenwerkzeug
+### Blocks ### (Eigentlich ItemBlock unlocalized names, wenn man sie im Inventar anschaut)
+tile.tableLeft.oak.name=Architektentisch aus Eichenholz
+tile.tableLeft.spruce.name=Architektentisch aus Fichtenholz
+tile.tableLeft.birch.name=Architektentisch aus Birkenholz
+tile.tableLeft.jungle.name=Architektentisch aus Tropenholz
+tile.tableLeft.acacia.name=Architektentisch aus Akazienholz
+tile.tableLeft.dark_oak.name=Architektentisch aus Schwarzeichenholz
 
-# Blocks
-tile.architectTable.name=Architektentisch
+### Items ###
+item.drawingTools.name=Zeichenwerkzeug

@@ -4,10 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +18,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -28,16 +31,6 @@ public class BlockPinboardLeft extends BlockArchitectTableNEW {
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.SOUTH));
     }
 
-    /** This must be overriden for every block with properties. */ // No different Wood-Types for the pinboard for now.
-    @Override
-    protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, new IProperty[] { FACING }); }
-
-    /** Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
-     * IBlockstate */
-    @Override
-    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
-    { return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite()); }
-
     /** This is used together with getMetaFromState when saving the world / reloading the data from a saved world into BlockStates. (the direction is set in getActualState dynamically) */
     @Override
     public IBlockState getStateFromMeta(int meta) { return this.getDefaultState(); }
@@ -45,6 +38,20 @@ public class BlockPinboardLeft extends BlockArchitectTableNEW {
     /** Convert the BlockState into the correct metadata value */
     @Override
     public int getMetaFromState(IBlockState state) { return 0; }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
+    {
+        // The direction in which BlockPinboardRight lies determines which facing direction the multiBlock (hence this block) will have.
+        // Example: If BlockPinboardRight lies north from BlockPinboardLeft the blocks are facing east.
+        if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockPinboardRight) {
+            return state.withProperty(FACING, EnumFacing.EAST);
+        } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockPinboardRight) {
+            return state.withProperty(FACING, EnumFacing.WEST);
+        } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockPinboardRight) {
+            return state.withProperty(FACING, EnumFacing.NORTH);
+        } else return state.withProperty(FACING, EnumFacing.SOUTH);
+    }
 
     /** The boundingBoxes determine the colliding with the blocks. */
     @Override
@@ -88,23 +95,6 @@ public class BlockPinboardLeft extends BlockArchitectTableNEW {
         }
     }
 
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) { return Items.ITEM_FRAME; }
-
-    @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        // The direction in which BlockPinboardRight lies determines which facing direction the multiBlock (hence this block) will have.
-        // Example: If BlockPinboardRight lies north from BlockPinboardLeft the blocks are facing east.
-        if (worldIn.getBlockState(pos.north()).getBlock() instanceof BlockPinboardRight) {
-            return state.withProperty(FACING, EnumFacing.EAST);
-        } else if (worldIn.getBlockState(pos.south()).getBlock() instanceof BlockPinboardRight) {
-            return state.withProperty(FACING, EnumFacing.WEST);
-        } else if (worldIn.getBlockState(pos.west()).getBlock() instanceof BlockPinboardRight) {
-            return state.withProperty(FACING, EnumFacing.NORTH);
-        } else return state.withProperty(FACING, EnumFacing.SOUTH);
-    }
-
     /** I've put in some effort so that this method only gets executed if a full multiBlock is present. (else non-multiBlock-blocks could get destroyed in the process) */
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
@@ -121,7 +111,41 @@ public class BlockPinboardLeft extends BlockArchitectTableNEW {
         }
     }
 
-    /** Helping method */
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) { return Items.ITEM_FRAME; }
+
+    /** Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate */
+    @Override
+    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+    { return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite()); }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) { }
+
+    /** This must be overriden for every block with properties. */ // No different Wood-Types for the pinboard for now.
+    @Override
+    protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, new IProperty[] { FACING }); }
+
+    /* ======================================== HELPING METHODS =====================================*/
+
+    private boolean isPartOfFullMultiBlock(World worldIn, BlockPos pos, IBlockState state) {
+        EnumFacing blockFacing = this.getActualState(state, worldIn, pos).getValue(FACING);
+
+        switch (blockFacing) {
+            case NORTH: // facing north means BlockPinboardRight must be west of it.
+                return (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.west()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.west().down()).getBlock() instanceof BlockTableRight);
+            case SOUTH: // facing south means BlockPinboardRight must be east of it.
+                return (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.east()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.east().down()).getBlock() instanceof BlockTableRight);
+            case WEST: // facing west means BlockPinboardRight must be south of it.
+                return (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.south()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.south().down()).getBlock() instanceof BlockTableRight);
+            case EAST: // facing east means BlockPinboardRight must be north of it.
+                return (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.north()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.north().down()).getBlock() instanceof BlockTableRight);
+            default: return false;
+        }
+    }
+
     private void breakOtherThreeBlocks(World worldIn, BlockPos pos, IBlockState state, boolean dropItems) {
         EnumFacing blockFacing = this.getActualState(state, worldIn, pos).getValue(FACING);
 
@@ -147,23 +171,6 @@ public class BlockPinboardLeft extends BlockArchitectTableNEW {
                 worldIn.destroyBlock(pos.north().down(), dropItems);
                 break;
             default: break;
-        }
-    }
-
-    /** Helping method */
-    private boolean isPartOfFullMultiBlock(World worldIn, BlockPos pos, IBlockState state) {
-        EnumFacing blockFacing = this.getActualState(state, worldIn, pos).getValue(FACING);
-
-        switch (blockFacing) {
-            case NORTH: // facing north means BlockPinboardRight must be west of it.
-                return (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.west()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.west().down()).getBlock() instanceof BlockTableRight);
-            case SOUTH: // facing south means BlockPinboardRight must be east of it.
-                return (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.east()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.east().down()).getBlock() instanceof BlockTableRight);
-            case WEST: // facing west means BlockPinboardRight must be south of it.
-                return (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.south()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.south().down()).getBlock() instanceof BlockTableRight);
-            case EAST: // facing east means BlockPinboardRight must be north of it.
-                return (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockTableLeft && worldIn.getBlockState(pos.north()).getBlock() instanceof BlockPinboardRight && worldIn.getBlockState(pos.north().down()).getBlock() instanceof BlockTableRight);
-            default: return false;
         }
     }
 }

@@ -1,8 +1,13 @@
-# Creative Tab
+### Creative Tab ###
 itemGroup.architecttable=Architect Table
 
-# Items
-item.drawingTools.name=Drawing Tools
+### Blocks ### (in fact ItemBlock unlocalized names when looked at in inventory)
+tile.tableLeft.oak.name=Oak Architect Table
+tile.tableLeft.spruce.name=Spruce Architect Table
+tile.tableLeft.birch.name=Birch Architect Table
+tile.tableLeft.jungle.name=Jungle Architect Table
+tile.tableLeft.acacia.name=Acacia Architect Table
+tile.tableLeft.dark_oak.name=Dark Oak Architect Table
 
-# Blocks
-tile.architectTable.name=Architect Table
+### Items ###
+item.drawingTools.name=Drawing Tools
